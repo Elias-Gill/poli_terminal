@@ -10,7 +10,6 @@ import (
 )
 
 func main() {
-
 	m := cli.NewApp()
     // run
 	p := tea.NewProgram(m, tea.WithAltScreen())

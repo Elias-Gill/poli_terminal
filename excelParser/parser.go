@@ -6,7 +6,7 @@ import (
 	"github.com/xuri/excelize/v2"
 )
 
-type materia struct {
+type Materia struct {
 	Nombre   string
 	Semestre int
 	Seccion  string
@@ -22,7 +22,7 @@ type rowLimit struct {
 	fin    int
 }
 
-// determinar donde termina la lista de materias
+// Determinar donde comeinza y termina la lista de materias
 func getValidRows(mat [][]string) rowLimit {
 	res := rowLimit{inicio: 1, fin: 1}
 	// detemrinar el inicio
@@ -44,7 +44,7 @@ func getValidRows(mat [][]string) rowLimit {
 
 // retorna la lista de materias de la carrera con fechas de finales, semestre,
 // parciales, profesor y seccion
-func GetListaMaterias(fname string) map[string]materia {
+func GetListaMaterias(fname string) []Materia {
 	file, err := excelize.OpenFile(fname)
 	if err != nil {
 		panic("no se puede abrir el archivo")
@@ -58,12 +58,12 @@ func GetListaMaterias(fname string) map[string]materia {
 
 	// determinar donde empieza la lista de materias
 	validRows := getValidRows(cols)
-	asignaturas := make(map[string]materia)
+	asignaturas := []Materia{}
 
 	// comenzar a cargar la lista de asignaturas
 	for row := validRows.inicio; row < validRows.fin+1; row++ {
 		s, _ := strconv.Atoi(cols[3][row])
-		asignaturas[string(cols[2][row])] = materia{
+		asignaturas = append(asignaturas, Materia{
 			Nombre:   string(cols[2][row]),
 			Semestre: s,
 			Seccion:  string(cols[9][row]),
@@ -72,7 +72,7 @@ func GetListaMaterias(fname string) map[string]materia {
 			Parcial2: string(cols[18][row]) + " " + string(cols[19][row]) + " " + string(cols[20][row]),
 			Final1:   string(cols[21][row]) + " " + string(cols[22][row]) + " " + string(cols[23][row]),
 			Final2:   string(cols[24][row]) + " " + string(cols[25][row]) + " " + string(cols[26][row]),
-		}
+		})
 	}
 	return asignaturas
 }
