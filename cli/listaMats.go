@@ -8,8 +8,11 @@ import (
 	"github.com/elias-gill/poli_terminal/excelParser"
 )
 
-func NewListaMats(height, width int, file string) ListaMats {
-	materias := excelParser.GetListaMaterias(file)
+func NewListaMats(height, width int, file string) (*ListaMats, error) {
+	materias, err := excelParser.GetListaMaterias(file)
+    if err != nil {
+        return nil, err
+    }
 	items := []list.Item{}
 	// cargar las materias disponibles
 	for i, mat := range materias {
@@ -23,7 +26,7 @@ func NewListaMats(height, width int, file string) ListaMats {
 	m.List.Title = "Lista de asignaturas"
 	m.List.SetWidth(width)
 	m.List.SetHeight(height)
-	return m
+	return &m, nil
 }
 
 type itemLista struct {
@@ -44,7 +47,7 @@ func (m ListaMats) Init() tea.Cmd {
 }
 
 // actualizar el modelo
-func (m ListaMats) Update(msg tea.Msg) (ListaMats, tea.Cmd) {
+func (m ListaMats) Update(msg tea.Msg) (*ListaMats, tea.Cmd) {
 	options := map[string]struct{}{"q": {}, "esc": {}, "ctrl+c": {}}
 	// handle special events
 	switch msg := msg.(type) {
@@ -55,7 +58,7 @@ func (m ListaMats) Update(msg tea.Msg) (ListaMats, tea.Cmd) {
 		// si la tecla precionada es una de las de salir
 		_, keyExit := options[msg.String()]
 		if keyExit {
-			return m, tea.Quit
+			return &m, tea.Quit
 		}
 
 	case tea.WindowSizeMsg:
@@ -65,7 +68,7 @@ func (m ListaMats) Update(msg tea.Msg) (ListaMats, tea.Cmd) {
 
 	var cmd tea.Cmd
 	m.List, cmd = m.List.Update(msg)
-	return m, cmd
+	return &m, cmd
 }
 
 // mostrar menu de seleccion

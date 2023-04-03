@@ -2,6 +2,7 @@ package cli
 
 import (
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/elias-gill/poli_terminal/configManager"
 )
 
 // modos
@@ -11,23 +12,23 @@ const (
 	inHorario
 	inSelection
 	inListMats
+	inAlert
 )
 
 type App struct {
 	Mode      int
 	appWith   int
 	appHeight int
-    fHorario  string
+	config    configManager.Configurations
 	// components
 	mainMenu  MainMenu
-	listaMats ListaMats
+	listaMats *ListaMats
 }
 
 func NewApp() App {
 	return App{
 		mainMenu: NewMainMenu(),
-        // TODO: leer de un archivo de configuracion
-		fHorario: "/home/elias/Documentos/go_proyects/poli_terminal/assets/Horario-de-clases-y-examenes-del-Segundo-Periodo-2022-version-web-24032023.xlsx",
+		config: configManager.GetUserConfig(),
 		Mode:     inMenu,
 	}
 }
@@ -47,24 +48,19 @@ func (a App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	// handle events
 	switch a.Mode {
-	case inCalendar: // el juego se encuentra corriendo
-		// TODO: REALIZAR LOS CAMBIOS PERTINENTES
-		// if a.Game.Done {
-		// 	a.Game.Done = false
-		// 	a.Mode = menu
-		// 	return a, nil
-		// }
-		// actualizar el juego
-		// a.Game, cmd = a.Game.Update(msg)
+	case inCalendar: // TODO: implementar
 		return a, cmd
 
-	case inListMats: // el juego se encuentra corriendo
+	case inAlert: // TODO: implementar
+		return a, cmd
+
+	case inListMats:
 		a.listaMats, cmd = a.listaMats.Update(msg)
 		return a, cmd
 	}
 
+	// por defecto nos encontramos en el menu principal
 	a.mainMenu, cmd = a.mainMenu.Update(msg)
-	// cambiar el modo despues de una seleccion
 	if a.mainMenu.Selected {
 		return a.selectMode()
 	}
@@ -82,6 +78,9 @@ func (m App) View() string {
 
 	case inCalendar:
 		return "Sorry, this is not implemented yet"
+
+	case inAlert:
+		return "Loco, implementa las alertas"
 	}
 	// por default se muestra el menu principal
 	return docStyle.Render(m.mainMenu.View())
@@ -98,7 +97,14 @@ func (a App) selectMode() (tea.Model, tea.Cmd) {
 	switch a.mainMenu.List.SelectedItem().FilterValue() {
 	case "listaMats": // abrir la lista de materias entera
 		a.Mode = inListMats
-		a.listaMats = NewListaMats(a.appHeight, a.appWith, a.fHorario)
+		var err error
+		a.listaMats, err = NewListaMats(a.appHeight, a.appWith, a.config.FHorario)
+        if err != nil {
+            panic(err)
+        }
+		// if err != nil {
+		// 	a.Mode = inAlert
+		// }
 		return a, cmd
 
 	case "horario": // abrir mi horario TODO: IMPLEMENTAR

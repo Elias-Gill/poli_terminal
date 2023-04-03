@@ -7,14 +7,14 @@ import (
 )
 
 type Materia struct {
-	Nombre   string
-	Semestre int
-	Seccion  string
-	Profesor string
-	Parcial1 string
-	Parcial2 string
-	Final1   string
-	Final2   string
+	Nombre   string `json:"nombre"`
+	Semestre int    `json:"semestre"`
+	Seccion  string `json:"seccion"`
+	Profesor string `json:"profesor"`
+	Parcial1 string `json:"parcial_1"`
+	Parcial2 string `json:"parcial_2"`
+	Final1   string `json:"final_1"`
+	Final2   string `json:"final_2"`
 }
 
 type rowLimit struct {
@@ -44,16 +44,16 @@ func getValidRows(mat [][]string) rowLimit {
 
 // retorna la lista de materias de la carrera con fechas de finales, semestre,
 // parciales, profesor y seccion
-func GetListaMaterias(fname string) []Materia {
+func GetListaMaterias(fname string) ([]Materia, error) {
+	// abrir el archivo excel
 	file, err := excelize.OpenFile(fname)
 	if err != nil {
-		panic("no se puede abrir el archivo")
+		return nil, err
 	}
-
-	// abrir el archivo excel
+	// parsear las columnas
 	cols, err := file.GetCols(file.GetSheetName(6))
 	if err != nil {
-		panic("no se pueden traer las columnas")
+		return nil, err
 	}
 
 	// determinar donde empieza la lista de materias
@@ -74,5 +74,5 @@ func GetListaMaterias(fname string) []Materia {
 			Final2:   string(cols[24][row]) + " " + string(cols[25][row]) + " " + string(cols[26][row]),
 		})
 	}
-	return asignaturas
+	return asignaturas, nil
 }
