@@ -3,6 +3,7 @@ package cli
 import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/elias-gill/poli_terminal/styles"
 )
 
 func NewMainMenu() MainMenu {
@@ -53,7 +54,7 @@ func (m MainMenu) Update(msg tea.Msg) (MainMenu, tea.Cmd) {
 		}
 
 	case tea.WindowSizeMsg:
-		h, v := docStyle.GetFrameSize()
+		h, v := styles.DocStyle.GetFrameSize()
 		m.List.SetSize(msg.Width-h, msg.Height-v)
 	}
 

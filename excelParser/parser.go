@@ -44,14 +44,14 @@ func getValidRows(mat [][]string) rowLimit {
 
 // retorna la lista de materias de la carrera con fechas de finales, semestre,
 // parciales, profesor y seccion
-func GetListaMaterias(fname string) ([]Materia, error) {
+func GetListaMaterias(fname string, sheet int) ([]Materia, error) {
 	// abrir el archivo excel
 	file, err := excelize.OpenFile(fname)
 	if err != nil {
 		return nil, err
 	}
 	// parsear las columnas
-	cols, err := file.GetCols(file.GetSheetName(6))
+	cols, err := file.GetCols(file.GetSheetName(sheet))
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +60,7 @@ func GetListaMaterias(fname string) ([]Materia, error) {
 	validRows := getValidRows(cols)
 	asignaturas := []Materia{}
 
-	// comenzar a cargar la lista de asignaturas
+    // Comenzar a cargar la lista de asignaturas INFO: una columna mas a los examens me trae el "aula"
 	for row := validRows.inicio; row < validRows.fin+1; row++ {
 		s, _ := strconv.Atoi(cols[3][row])
 		asignaturas = append(asignaturas, Materia{
@@ -68,10 +68,10 @@ func GetListaMaterias(fname string) ([]Materia, error) {
 			Semestre: s,
 			Seccion:  string(cols[9][row]),
 			Profesor: string(cols[13][row]) + " " + string(cols[12][row]),
-			Parcial1: string(cols[15][row]) + " " + string(cols[16][row]) + " " + string(cols[17][row]),
-			Parcial2: string(cols[18][row]) + " " + string(cols[19][row]) + " " + string(cols[20][row]),
-			Final1:   string(cols[21][row]) + " " + string(cols[22][row]) + " " + string(cols[23][row]),
-			Final2:   string(cols[24][row]) + " " + string(cols[25][row]) + " " + string(cols[26][row]),
+			Parcial1: string(cols[15][row]) + " " + string(cols[16][row]),
+			Parcial2: string(cols[18][row]) + " " + string(cols[19][row]),
+			Final1:   string(cols[21][row]) + " " + string(cols[22][row]),
+			Final2:   string(cols[24][row]) + " " + string(cols[25][row]),
 		})
 	}
 	return asignaturas, nil

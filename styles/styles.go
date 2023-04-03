@@ -1,27 +1,27 @@
-package cli
+package styles
 
 import "github.com/charmbracelet/lipgloss"
 
 var (
 	// docStyle corresponde al estilo utilizado para renderizar la app entera
-	docStyle = lipgloss.NewStyle().Width(200).
+	DocStyle = lipgloss.NewStyle().Width(200).
 			Height(20).
 			Margin(1, 2)
 
 	// styles to colorate strings while the user is typing
-	goodStyle = lipgloss.NewStyle().
+	GoodStyle = lipgloss.NewStyle().
 			Bold(true).
 			Foreground(lipgloss.Color("#43d11c"))
 
-	badStyle = lipgloss.NewStyle().
+	BadStyle = lipgloss.NewStyle().
 			Bold(true).
 			Foreground(lipgloss.Color("#f40045"))
 
-	doneStyle = lipgloss.NewStyle().
+	DoneStyle = lipgloss.NewStyle().
 			Bold(true).
 			Foreground(lipgloss.Color("#ae67f0"))
 
-	authorStyle = lipgloss.NewStyle().
+	AuthorStyle = lipgloss.NewStyle().
 			Bold(true).
 			Foreground(lipgloss.Color("#999999"))
 )

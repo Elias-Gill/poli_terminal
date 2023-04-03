@@ -3,6 +3,8 @@ package cli
 import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/elias-gill/poli_terminal/configManager"
+	"github.com/elias-gill/poli_terminal/cli/listado"
+	"github.com/elias-gill/poli_terminal/styles"
 )
 
 // modos
@@ -22,7 +24,7 @@ type App struct {
 	config    configManager.Configurations
 	// components
 	mainMenu  MainMenu
-	listaMats *ListaMats
+	listaMats *listado.ListaMats
 }
 
 func NewApp() App {
@@ -76,7 +78,7 @@ func (a App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m App) View() string {
 	switch m.Mode {
 	case inListMats:
-		return docStyle.Render(m.listaMats.View())
+		return styles.DocStyle.Render(m.listaMats.View())
 
 	case inHorario:
 		// TODO: IMPLEMENTAR
@@ -88,7 +90,7 @@ func (m App) View() string {
 		// TODO: IMPLEMENTAR
 	}
 	// por default se muestra el menu principal
-	return docStyle.Render(m.mainMenu.View())
+	return styles.DocStyle.Render(m.mainMenu.View())
 }
 
 /*
@@ -103,7 +105,7 @@ func (a App) selectMode() (tea.Model, tea.Cmd) {
 	case "listaMats": // abrir la lista de materias entera
 		a.Mode = inListMats
 		var err error
-		a.listaMats, err = NewListaMats(a.appHeight, a.appWith, a.config.FHorario)
+		a.listaMats, err = listado.NewListaMats(a.appHeight, a.appWith, a.config.FHorario)
 		if err != nil {
 			panic(err)
 		}
