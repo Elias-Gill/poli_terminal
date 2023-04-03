@@ -28,7 +28,7 @@ type App struct {
 func NewApp() App {
 	return App{
 		mainMenu: NewMainMenu(),
-		config: configManager.GetUserConfig(),
+		config:   configManager.GetUserConfig(),
 		Mode:     inMenu,
 	}
 }
@@ -48,22 +48,27 @@ func (a App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	// handle events
 	switch a.Mode {
-	case inCalendar: // TODO: implementar
-		return a, cmd
+	case inCalendar:
+		// TODO: implementar
 
-	case inAlert: // TODO: implementar
-		return a, cmd
+	case inAlert:
+		// TODO: implementar
 
 	case inListMats:
 		a.listaMats, cmd = a.listaMats.Update(msg)
-		return a, cmd
+		if a.listaMats.Quit {
+			a.Mode = inMenu
+		}
+
+	case inMenu:
+		// por defecto nos encontramos en el menu principal
+		a.mainMenu, cmd = a.mainMenu.Update(msg)
+        // WARN: no tratar de refactorear, problemas de performance
+		if a.mainMenu.Selected {
+			return a.selectMode()
+		}
 	}
 
-	// por defecto nos encontramos en el menu principal
-	a.mainMenu, cmd = a.mainMenu.Update(msg)
-	if a.mainMenu.Selected {
-		return a.selectMode()
-	}
 	return a, cmd
 }
 
@@ -74,13 +79,13 @@ func (m App) View() string {
 		return docStyle.Render(m.listaMats.View())
 
 	case inHorario:
-		return "Sorry, this is not implemented yet"
+		// TODO: IMPLEMENTAR
 
 	case inCalendar:
-		return "Sorry, this is not implemented yet"
+		// TODO: IMPLEMENTAR
 
 	case inAlert:
-		return "Loco, implementa las alertas"
+		// TODO: IMPLEMENTAR
 	}
 	// por default se muestra el menu principal
 	return docStyle.Render(m.mainMenu.View())
@@ -99,27 +104,21 @@ func (a App) selectMode() (tea.Model, tea.Cmd) {
 		a.Mode = inListMats
 		var err error
 		a.listaMats, err = NewListaMats(a.appHeight, a.appWith, a.config.FHorario)
-        if err != nil {
-            panic(err)
-        }
+		if err != nil {
+			panic(err)
+		}
 		// if err != nil {
-		// 	a.Mode = inAlert
+		// a.Mode = inAlert
 		// }
-		return a, cmd
 
 	case "horario": // abrir mi horario TODO: IMPLEMENTAR
-		a.Mode = inHorario
-		return a, cmd
+		// a.Mode = inHorario
 
 	case "calendario": // abrir el calendario TODO: IMPLEMENTAR
-		a.Mode = inCalendar
-		// a.Game = NewTyper(a.appWith)
-		// cmd = a.Game.Init()
-		return a, cmd
+		// a.Mode = inCalendar
 
 	case "nuevo_hor": // crear nuevo horario TODO: IMPLEMENTAR
-		a.Mode = inSelection
-		return a, cmd
+		// a.Mode = inSelection
 	}
 	return a, cmd
 }

@@ -24,12 +24,17 @@ func NewListaMats(height, width int, file string) (*ListaMats, error) {
 		})
 	}
 
-	m := ListaMats{List: list.New(items, list.NewDefaultDelegate(), 0, 0)}
+	m := ListaMats{
+		List:     list.New(items, list.NewDefaultDelegate(), 0, 0),
+		Selected: false,
+		Quit:     false,
+	}
 	m.List.Title = "Lista de asignaturas"
 	h, v := docStyle.GetFrameSize()
 	m.List.SetWidth(width - v)
 	m.List.SetHeight(height - h)
 	m.List.SelectedItem()
+
 	return &m, nil
 }
 
@@ -44,6 +49,7 @@ func (i itemLista) FilterValue() string { return i.Tit }
 type ListaMats struct {
 	List     list.Model
 	Selected bool
+	Quit     bool
 }
 
 func (m ListaMats) Init() tea.Cmd {
@@ -51,11 +57,18 @@ func (m ListaMats) Init() tea.Cmd {
 }
 
 func (m ListaMats) Update(msg tea.Msg) (*ListaMats, tea.Cmd) {
+	options := map[string]struct{}{"q": {}, "esc": {}, "ctrl+c": {}}
 	// handle special events
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		if msg.String() == "enter" {
 			m.Selected = true
+		}
+		// si la tecla precionada es una de las de salir
+		_, keyExit := options[msg.String()]
+		if keyExit {
+            m.Quit = true
+			return &m, nil
 		}
 
 	case tea.WindowSizeMsg:
