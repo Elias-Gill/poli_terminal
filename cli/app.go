@@ -2,8 +2,9 @@ package cli
 
 import (
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/elias-gill/poli_terminal/configManager"
 	"github.com/elias-gill/poli_terminal/cli/listado"
+	"github.com/elias-gill/poli_terminal/configManager"
+	"github.com/elias-gill/poli_terminal/excelParser"
 	"github.com/elias-gill/poli_terminal/styles"
 )
 
@@ -24,6 +25,7 @@ type App struct {
 	config    configManager.Configurations
 	// components
 	mainMenu  MainMenu
+	horario   listado.Horario
 	listaMats *listado.ListaMats
 }
 
@@ -56,6 +58,12 @@ func (a App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case inAlert:
 		// TODO: implementar
 
+	case inHorario:
+        a.horario, cmd = a.horario.Update(msg)
+		if a.horario.Quit {
+			a.Mode = inMenu
+		}
+
 	case inListMats:
 		a.listaMats, cmd = a.listaMats.Update(msg)
 		if a.listaMats.Quit {
@@ -65,7 +73,7 @@ func (a App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case inMenu:
 		// por defecto nos encontramos en el menu principal
 		a.mainMenu, cmd = a.mainMenu.Update(msg)
-        // WARN: no tratar de refactorear, problemas de performance
+		// WARN: no tratar de refactorear, problemas de performance
 		if a.mainMenu.Selected {
 			return a.selectMode()
 		}
@@ -81,7 +89,7 @@ func (m App) View() string {
 		return styles.DocStyle.Render(m.listaMats.View())
 
 	case inHorario:
-		// TODO: IMPLEMENTAR
+		return styles.DocStyle.Render(m.horario.View())
 
 	case inCalendar:
 		// TODO: IMPLEMENTAR
@@ -94,7 +102,7 @@ func (m App) View() string {
 }
 
 /*
-triggered when and option is selected in the main menu.
+triggered when and option is 3elected in the main menu.
 Handles the App state and sets the correct mode
 */
 func (a App) selectMode() (tea.Model, tea.Cmd) {
@@ -109,12 +117,18 @@ func (a App) selectMode() (tea.Model, tea.Cmd) {
 		if err != nil {
 			panic(err)
 		}
-		// if err != nil {
-		// a.Mode = inAlert
-		// }
 
-	case "horario": // abrir mi horario TODO: IMPLEMENTAR
-		// a.Mode = inHorario
+	case "horario": // abrir mi horario
+		a.Mode = inHorario
+		var err error
+		a.horario = listado.NewInfoMateria([]excelParser.Materia{
+			{Nombre: "materoas1"},
+			{Nombre: "materoas2"},
+			{Nombre: "materoas3"},
+		})
+		if err != nil {
+			panic(err)
+		}
 
 	case "calendario": // abrir el calendario TODO: IMPLEMENTAR
 		// a.Mode = inCalendar

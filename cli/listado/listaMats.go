@@ -21,7 +21,7 @@ func NewListaMats(height, width int, file string) (*ListaMats, error) {
 	// Cargar las materias disponibles
 	for i, mat := range materias {
 		aux := itemLista{
-			Tit:  mat.Nombre + " #" + strconv.Itoa(i),
+			Tit:  "#" + strconv.Itoa(i) + "  " + mat.Nombre,
 			Desc: mat.Seccion + " - " + mat.Profesor,
 		}
 		items = append(items, aux)
@@ -55,7 +55,7 @@ type ListaMats struct {
 	List     list.Model
 	materias []excelParser.Materia
 	Selected bool
-	infoMat  infoMateria
+	infoMat  Horario
 	Quit     bool
 }
 
@@ -86,14 +86,14 @@ func (m ListaMats) Update(msg tea.Msg) (*ListaMats, tea.Cmd) {
 		}
 		// si la tecla precionada es una de las de salir
 		_, keyExit := options[msg.String()]
-		if keyExit && !filtering{
+		if keyExit && !filtering {
 			m.Quit = true
 			return &m, nil
 		}
 
 	case tea.WindowSizeMsg:
 		h, v := styles.DocStyle.GetFrameSize()
-		m.List.SetSize(msg.Width-h, msg.Height-v)
+		m.List.SetSize(msg.Width-h, msg.Height-v-6)
 	}
 
 	var cmd tea.Cmd

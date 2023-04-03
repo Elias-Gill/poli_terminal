@@ -13,14 +13,14 @@ var baseStyle = lipgloss.NewStyle().
 	BorderStyle(lipgloss.NormalBorder()).
 	BorderForeground(lipgloss.Color("240"))
 
-type infoMateria struct {
+type Horario struct {
 	table table.Model
 	Quit  bool
 }
 
-func (m infoMateria) Init() tea.Cmd { return nil }
+func (m Horario) Init() tea.Cmd { return nil }
 
-func (m infoMateria) Update(msg tea.Msg) (infoMateria, tea.Cmd) {
+func (m Horario) Update(msg tea.Msg) (Horario, tea.Cmd) {
 	var cmd tea.Cmd
 	options := map[string]struct{}{"q": {}, "esc": {}, "ctrl+c": {}}
 
@@ -38,20 +38,20 @@ func (m infoMateria) Update(msg tea.Msg) (infoMateria, tea.Cmd) {
 	return m, cmd
 }
 
-func (m infoMateria) View() string {
+func (m Horario) View() string {
 	return baseStyle.Render(m.table.View()) + "\n"
 }
 
-func NewInfoMateria(m []ep.Materia) infoMateria {
+func NewInfoMateria(m []ep.Materia) Horario {
 	columns := []table.Column{
-		{Title: "Asignatura", Width: 25},
-		{Title: "Profesor", Width: 32},
-		{Title: "Semestre", Width: 10},
-		{Title: "Seccion", Width: 10},
-		{Title: "Parcial 1", Width: 21},
-		{Title: "Parcial 2", Width: 21},
-		{Title: "Final 1", Width: 21},
-		{Title: "Final 2", Width: 21},
+		{Title: "Asignatura", Width: 18},
+		{Title: "Profesor", Width: 18},
+		{Title: "Semestre", Width: 8},
+		{Title: "Seccion", Width: 7},
+		{Title: "Parcial 1", Width: 18},
+		{Title: "Parcial 2", Width: 18},
+		{Title: "Final 1", Width: 18},
+		{Title: "Final 2", Width: 18},
 	}
 
 	rows := []table.Row{}
@@ -72,7 +72,7 @@ func NewInfoMateria(m []ep.Materia) infoMateria {
 		table.WithColumns(columns),
 		table.WithRows(rows),
 		table.WithFocused(true),
-		table.WithHeight(7),
+		table.WithHeight(8),
 	)
 
 	s := table.DefaultStyles()
@@ -87,7 +87,7 @@ func NewInfoMateria(m []ep.Materia) infoMateria {
 		Bold(false)
 	t.SetStyles(s)
 
-	return infoMateria{
+	return Horario{
 		table: t,
 		Quit:  false,
 	}

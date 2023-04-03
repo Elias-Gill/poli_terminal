@@ -35,7 +35,7 @@ func getValidRows(mat [][]string) rowLimit {
 	// detemrinar el inicio
 	for i := res.inicio; i < len(mat[0]); i++ {
 		if mat[0][i] == "" {
-			res.fin = i
+			res.fin = i-1
 			break
 		}
 	}
