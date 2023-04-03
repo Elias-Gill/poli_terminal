@@ -8,34 +8,38 @@ import (
 	"github.com/elias-gill/poli_terminal/excelParser"
 )
 
+// Retorna una nueva lista de materias. En caso de no poder abrirse el archivo excel, o este no ser valido,
+// se retorna un error
 func NewListaMats(height, width int, file string) (*ListaMats, error) {
 	materias, err := excelParser.GetListaMaterias(file)
-    if err != nil {
-        return nil, err
-    }
+	if err != nil {
+		return nil, err
+	}
 	items := []list.Item{}
-	// cargar las materias disponibles
+	// Cargar las materias disponibles
 	for i, mat := range materias {
 		items = append(items, itemLista{
-			Tit:    mat.Nombre,
-			Desc:   mat.Seccion + " - " + mat.Profesor,
-			Action: strconv.Itoa(i)})
+			Tit:  mat.Nombre + " #" + strconv.Itoa(i),
+			Desc: mat.Seccion + " - " + mat.Profesor,
+		})
 	}
 
 	m := ListaMats{List: list.New(items, list.NewDefaultDelegate(), 0, 0)}
 	m.List.Title = "Lista de asignaturas"
-	m.List.SetWidth(width)
-	m.List.SetHeight(height)
+	h, v := docStyle.GetFrameSize()
+	m.List.SetWidth(width - v)
+	m.List.SetHeight(height - h)
+	m.List.SelectedItem()
 	return &m, nil
 }
 
 type itemLista struct {
-	Tit, Desc, Action string
+	Tit, Desc string
 }
 
 func (i itemLista) Title() string       { return i.Tit }
 func (i itemLista) Description() string { return i.Desc }
-func (i itemLista) FilterValue() string { return i.Action }
+func (i itemLista) FilterValue() string { return i.Tit }
 
 type ListaMats struct {
 	List     list.Model
@@ -46,19 +50,12 @@ func (m ListaMats) Init() tea.Cmd {
 	return nil
 }
 
-// actualizar el modelo
 func (m ListaMats) Update(msg tea.Msg) (*ListaMats, tea.Cmd) {
-	options := map[string]struct{}{"q": {}, "esc": {}, "ctrl+c": {}}
 	// handle special events
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		if msg.String() == "enter" {
 			m.Selected = true
-		}
-		// si la tecla precionada es una de las de salir
-		_, keyExit := options[msg.String()]
-		if keyExit {
-			return &m, tea.Quit
 		}
 
 	case tea.WindowSizeMsg:
@@ -71,7 +68,6 @@ func (m ListaMats) Update(msg tea.Msg) (*ListaMats, tea.Cmd) {
 	return &m, cmd
 }
 
-// mostrar menu de seleccion
 func (m ListaMats) View() string {
 	return m.List.View()
 }

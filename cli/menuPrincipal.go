@@ -16,6 +16,7 @@ func NewMainMenu() MainMenu {
 
 	m := MainMenu{List: list.New(items, list.NewDefaultDelegate(), 0, 0)}
 	m.List.Title = "Mi Politerminal"
+    m.List.SetFilteringEnabled(false)
 	return m
 }
 
@@ -38,7 +39,7 @@ func (m MainMenu) Init() tea.Cmd {
 
 // actualizar el modelo
 func (m MainMenu) Update(msg tea.Msg) (MainMenu, tea.Cmd) {
-	options := map[string]struct{}{"q": {}, "esc": {}, "ctrl+c": {}}
+	exit_keys := map[string]struct{}{"q": {}, "esc": {}, "ctrl+c": {}}
     // handle special events
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -46,7 +47,7 @@ func (m MainMenu) Update(msg tea.Msg) (MainMenu, tea.Cmd) {
 			m.Selected = true
 		}
 		// si la tecla precionada es una de las de salir
-		_, keyExit := options[msg.String()]
+		_, keyExit := exit_keys[msg.String()]
 		if keyExit {
 			return m, tea.Quit
 		}
