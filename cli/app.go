@@ -2,8 +2,8 @@ package cli
 
 import (
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/elias-gill/poli_terminal/cli/listado"
 	"github.com/elias-gill/poli_terminal/cli/horario"
+	"github.com/elias-gill/poli_terminal/cli/listado"
 	"github.com/elias-gill/poli_terminal/configManager"
 	"github.com/elias-gill/poli_terminal/excelParser"
 	"github.com/elias-gill/poli_terminal/styles"
@@ -16,7 +16,6 @@ const (
 	inHorario
 	inSelection
 	inListMats
-	inAlert
 )
 
 type App struct {
@@ -61,9 +60,6 @@ func (a App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case inCalendar:
 		// TODO: implementar
 
-	case inAlert:
-		// TODO: implementar
-
 	case inHorario:
 		a.listaMats, cmd = a.listaMats.Update(msg)
 		if a.listaMats.Quit {
@@ -77,9 +73,7 @@ func (a App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case inMenu:
-		// por defecto nos encontramos en el menu principal
 		a.mainMenu, cmd = a.mainMenu.Update(msg)
-		// WARN: no tratar de refactorear, problemas de performance
 		if a.mainMenu.Selected {
 			return a.selectMode()
 		}
@@ -100,8 +94,6 @@ func (m App) View() string {
 	case inCalendar:
 		// TODO: IMPLEMENTAR
 
-	case inAlert:
-		// TODO: IMPLEMENTAR
 	}
 	// por default se muestra el menu principal
 	return styles.DocStyle.Render(m.mainMenu.View())
@@ -124,7 +116,7 @@ func (a App) selectMode() (tea.Model, tea.Cmd) {
 			panic(err)
 		}
 
-	case "horario": // abrir mi horario
+	case "horario": // abrir mi horario actual
 		a.Mode = inHorario
 		var err error
 		a.listaMats = horario.NewHorario([]excelParser.Materia{

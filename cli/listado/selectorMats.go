@@ -9,6 +9,23 @@ import (
 	"github.com/elias-gill/poli_terminal/styles"
 )
 
+type itemLista struct {
+	Tit, Desc string
+}
+
+func (i itemLista) Title() string       { return i.Tit }
+func (i itemLista) Description() string { return i.Desc }
+func (i itemLista) FilterValue() string { return i.Tit }
+
+type SelectMats struct {
+	List     list.Model
+	materias []excelParser.Materia
+	infoMode bool
+	focus    int
+	infoMat  infoMateria
+	Quit     bool
+}
+
 // Retorna una nueva lista de materias. En caso de no poder abrirse el archivo excel, o este no ser valido,
 // se retorna un error
 func NewSelectorMats(height, width int, file string) (*SelectMats, error) {
@@ -17,8 +34,8 @@ func NewSelectorMats(height, width int, file string) (*SelectMats, error) {
 	if err != nil {
 		return nil, err
 	}
-	items := []list.Item{}
 	// Cargar las materias disponibles
+	items := []list.Item{}
 	for i, mat := range materias {
 		aux := itemLista{
 			Tit:  "#" + strconv.Itoa(i) + "  " + mat.Nombre,
@@ -28,6 +45,7 @@ func NewSelectorMats(height, width int, file string) (*SelectMats, error) {
 		materias[i].Nombre = aux.FilterValue()
 	}
 
+    // instanciar
 	m := SelectMats{
 		List:     list.New(items, list.NewDefaultDelegate(), 0, 0),
 		infoMode: false,
@@ -41,26 +59,6 @@ func NewSelectorMats(height, width int, file string) (*SelectMats, error) {
 	m.List.SelectedItem()
 
 	return &m, nil
-}
-
-type itemLista struct {
-	Tit, Desc string
-}
-
-func (i itemLista) Title() string       { return i.Tit }
-func (i itemLista) Description() string { return i.Desc }
-func (i itemLista) FilterValue() string { return i.Tit }
-
-type SelectMats struct {
-	List     list.Model
-	materias []excelParser.Materia
-	infoMode bool
-	infoMat  infoMateria
-	Quit     bool
-}
-
-func (m SelectMats) Init() tea.Cmd {
-	return nil
 }
 
 func (m SelectMats) Update(msg tea.Msg) (*SelectMats, tea.Cmd) {
@@ -78,7 +76,7 @@ func (m SelectMats) Update(msg tea.Msg) (*SelectMats, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		filtering := m.List.FilterState().String() == "filtering"
-        // info de materia
+		// info de materia
 		if msg.String() == "i" && !filtering {
 			i := m.indexOf(m.List.SelectedItem().FilterValue())
 			m.infoMat = newInfoMateria(m.materias[i])
@@ -86,7 +84,7 @@ func (m SelectMats) Update(msg tea.Msg) (*SelectMats, tea.Cmd) {
 			return &m, nil
 		}
 
-        // TODO: Anadir matetria
+		// TODO: cuadros de info de materias
 
 		// si la tecla precionada es una de las de salir
 		_, keyExit := options[msg.String()]
@@ -106,9 +104,9 @@ func (m SelectMats) Update(msg tea.Msg) (*SelectMats, tea.Cmd) {
 }
 
 func (m SelectMats) View() string {
-    if m.infoMode {
-        return m.infoMat.View()
-    }
+	if m.infoMode {
+		return m.infoMat.View()
+	}
 	return m.List.View() + "\n\n"
 }
 
