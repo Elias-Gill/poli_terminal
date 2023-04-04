@@ -29,12 +29,15 @@ func (i infoMateria) Update(msg tea.Msg) (infoMateria, tea.Cmd) {
 }
 
 func (i infoMateria) View() string {
-	var res string
-	res += i.materia.Nombre + "\n" + i.materia.Profesor + "\n\n" +
-		styles.GoodStyle.Render("Parcial 1: \t") + i.materia.Parcial1 +
-		"\n" + styles.GoodStyle.Render("Parcial 2: \t") + i.materia.Parcial2 +
-		"\n\n" + styles.GoodStyle.Render("Final 1: \t") + i.materia.Final1 +
-		"\n" + styles.GoodStyle.Render("Final 2: \t") + i.materia.Final2
+	res := styles.DoneStyle.Render(i.materia.Nombre) + "\n"
+	for i := 0; i < 50; i++ {
+		res += "─"
+	}
+	res += "\n" + i.materia.Profesor + "\t" +
+		"\n\n\t" + styles.GoodStyle.Render("Parcial 1: \t") + i.materia.Parcial1 + "\t" +
+		"\n\t" + styles.GoodStyle.Render("Parcial 2: \t") + i.materia.Parcial2 + "\t" +
+		"\n\n\t" + styles.GoodStyle.Render("Final 1: \t") + i.materia.Final1 + "\t" +
+		"\n\t" + styles.GoodStyle.Render("Final 2: \t") + i.materia.Final2 + "\t"
 
 	return styles.DocStyle.Render(res)
 }

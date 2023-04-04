@@ -1,4 +1,4 @@
-package listado
+package horario
 
 import (
 	"strconv"
@@ -6,7 +6,6 @@ import (
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/elias-gill/poli_terminal/excelParser"
 	ep "github.com/elias-gill/poli_terminal/excelParser"
 )
 
@@ -17,8 +16,6 @@ var baseStyle = lipgloss.NewStyle().
 type Horario struct {
 	table    table.Model
 	Quit     bool
-	infoMode bool
-    infoComp infoMateria
 }
 
 func (m Horario) Init() tea.Cmd { return nil }
@@ -27,23 +24,8 @@ func (m Horario) Update(msg tea.Msg) (Horario, tea.Cmd) {
 	var cmd tea.Cmd
 	options := map[string]struct{}{"q": {}, "esc": {}}
 
-    // modo de informacion de la materia
-    if m.infoMode {
-        m.infoComp, cmd = m.infoComp.Update(msg)
-        if m.infoComp.Quit {
-            m.infoMode = false
-        }
-        return m, cmd
-    }
-
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		if msg.String() == "enter" {
-			m.infoMode = true
-            m.infoComp = newInfoMateria(excelParser.Materia{})
-            return m, nil
-		}
-
 		// si la tecla precionada es una de las de salir
 		_, keyExit := options[msg.String()]
 		if keyExit {

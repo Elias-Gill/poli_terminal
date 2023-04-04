@@ -2,6 +2,7 @@ package styles
 
 import "github.com/charmbracelet/lipgloss"
 
+// TODO: pulir los estilos porque ivai
 var (
 	// docStyle corresponde al estilo utilizado para renderizar la app entera
 	DocStyle = lipgloss.NewStyle().Width(200).

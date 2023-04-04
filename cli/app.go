@@ -3,6 +3,7 @@ package cli
 import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/elias-gill/poli_terminal/cli/listado"
+	"github.com/elias-gill/poli_terminal/cli/horario"
 	"github.com/elias-gill/poli_terminal/configManager"
 	"github.com/elias-gill/poli_terminal/excelParser"
 	"github.com/elias-gill/poli_terminal/styles"
@@ -25,7 +26,7 @@ type App struct {
 	config    configManager.Configurations
 	// components
 	mainMenu     MainMenu
-	listaMats    listado.Horario
+	listaMats    horario.Horario
 	selectorMats *listado.SelectMats
 }
 
@@ -126,7 +127,7 @@ func (a App) selectMode() (tea.Model, tea.Cmd) {
 	case "horario": // abrir mi horario
 		a.Mode = inHorario
 		var err error
-		a.listaMats = listado.NewHorario([]excelParser.Materia{
+		a.listaMats = horario.NewHorario([]excelParser.Materia{
 			{Nombre: "materoas1"},
 			{Nombre: "materoas2"},
 			{Nombre: "materoas3"},
