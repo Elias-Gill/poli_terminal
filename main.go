@@ -1,7 +1,6 @@
 package main
 
 import (
-    // "github.com/elias-gill/poli_terminal/excelParser"
 	"fmt"
 	"os"
 

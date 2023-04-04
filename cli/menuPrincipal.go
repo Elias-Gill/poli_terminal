@@ -10,8 +10,7 @@ func NewMainMenu() MainMenu {
 	items := []list.Item{
         menuItem{Action: "horario", Tit: "Mi horario", Desc: "Revisa tu horario semanal y las fechas de examenes"},
 		menuItem{Action: "calendario", Tit: "Calendario", Desc: "Mira en un calendario tus fechas de examenes"},
-		menuItem{Action: "nuevo_hor", Tit: "Nuevo horario", Desc: "Elimina el horario actual y crea uno desde 0"},
-		menuItem{Action: "listaMats", Tit: "Lista de materias", Desc: "Lista las asignaturas registradas para este semestre"},
+		menuItem{Action: "modHorario", Tit: "Modificar horario", Desc: "Realiza cambios al horario o crea uno desde 0"},
 		menuItem{Action: "salir", Tit: "Salir", Desc: "Mas vale que sea para fiestear, ehemm, estudiar..."},
 	}
 

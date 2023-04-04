@@ -24,9 +24,9 @@ type App struct {
 	appHeight int
 	config    configManager.Configurations
 	// components
-	mainMenu  MainMenu
-	horario   listado.Horario
-	listaMats *listado.ListaMats
+	mainMenu     MainMenu
+	listaMats    listado.Horario
+	selectorMats *listado.SelectMats
 }
 
 func NewApp() App {
@@ -42,12 +42,17 @@ func (m App) Init() tea.Cmd {
 }
 
 func (a App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	// actualizar el tamano de la app
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
+	// actualizar el tamano de la app
 	case tea.WindowSizeMsg:
 		a.appWith = msg.Width
 		a.appHeight = msg.Height
+	// salir
+	case tea.KeyMsg:
+		if msg.String() == tea.KeyCtrlC.String() {
+			return a, tea.Quit
+		}
 	}
 
 	// handle events
@@ -59,14 +64,14 @@ func (a App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// TODO: implementar
 
 	case inHorario:
-        a.horario, cmd = a.horario.Update(msg)
-		if a.horario.Quit {
+		a.listaMats, cmd = a.listaMats.Update(msg)
+		if a.listaMats.Quit {
 			a.Mode = inMenu
 		}
 
 	case inListMats:
-		a.listaMats, cmd = a.listaMats.Update(msg)
-		if a.listaMats.Quit {
+		a.selectorMats, cmd = a.selectorMats.Update(msg)
+		if a.selectorMats.Quit {
 			a.Mode = inMenu
 		}
 
@@ -86,10 +91,10 @@ func (a App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m App) View() string {
 	switch m.Mode {
 	case inListMats:
-		return styles.DocStyle.Render(m.listaMats.View())
+		return styles.DocStyle.Render(m.selectorMats.View())
 
 	case inHorario:
-		return styles.DocStyle.Render(m.horario.View())
+		return styles.DocStyle.Render(m.listaMats.View())
 
 	case inCalendar:
 		// TODO: IMPLEMENTAR
@@ -110,10 +115,10 @@ func (a App) selectMode() (tea.Model, tea.Cmd) {
 	a.mainMenu.Selected = false
 	// change app mode
 	switch a.mainMenu.List.SelectedItem().FilterValue() {
-	case "listaMats": // abrir la lista de materias entera
+	case "modHorario": // abrir la lista de materias entera
 		a.Mode = inListMats
 		var err error
-		a.listaMats, err = listado.NewListaMats(a.appHeight, a.appWith, a.config.FHorario)
+		a.selectorMats, err = listado.NewSelectorMats(a.appHeight, a.appWith, a.config.FHorario)
 		if err != nil {
 			panic(err)
 		}
@@ -121,7 +126,7 @@ func (a App) selectMode() (tea.Model, tea.Cmd) {
 	case "horario": // abrir mi horario
 		a.Mode = inHorario
 		var err error
-		a.horario = listado.NewInfoMateria([]excelParser.Materia{
+		a.listaMats = listado.NewHorario([]excelParser.Materia{
 			{Nombre: "materoas1"},
 			{Nombre: "materoas2"},
 			{Nombre: "materoas3"},
@@ -133,8 +138,6 @@ func (a App) selectMode() (tea.Model, tea.Cmd) {
 	case "calendario": // abrir el calendario TODO: IMPLEMENTAR
 		// a.Mode = inCalendar
 
-	case "nuevo_hor": // crear nuevo horario TODO: IMPLEMENTAR
-		// a.Mode = inSelection
 	}
 	return a, cmd
 }
