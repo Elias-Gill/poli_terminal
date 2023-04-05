@@ -15,7 +15,7 @@ const (
 	inCalendar
 	inHorario
 	inSelection
-	inListMats
+	inModHorario
 )
 
 type App struct {
@@ -49,6 +49,7 @@ func (a App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		a.appWith = msg.Width
 		a.appHeight = msg.Height
+
 	// salir
 	case tea.KeyMsg:
 		if msg.String() == tea.KeyCtrlC.String() {
@@ -67,7 +68,7 @@ func (a App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			a.Mode = inMenu
 		}
 
-	case inListMats:
+	case inModHorario:
 		a.selectorMats, cmd = a.selectorMats.Update(msg)
 		if a.selectorMats.Quit {
 			a.Mode = inMenu
@@ -86,7 +87,7 @@ func (a App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 // selecciona la vista dependiendo del estado de la aplicacion
 func (m App) View() string {
 	switch m.Mode {
-	case inListMats:
+	case inModHorario:
 		return styles.DocStyle.Render(m.selectorMats.View())
 
 	case inHorario:
@@ -110,10 +111,17 @@ func (a App) selectMode() (tea.Model, tea.Cmd) {
 	// change app mode
 	switch a.mainMenu.List.SelectedItem().FilterValue() {
 	case "modHorario": // abrir la lista de materias entera
-		a.Mode = inListMats
+		a.Mode = inModHorario
 		a.selectorMats = listado.NewArmador(a.config.FHorario)
+		// truco para mandar informacion de tamano
+		a.selectorMats, _ = a.selectorMats.Update(
+			tea.WindowSizeMsg{
+				Width:  a.appWith,
+				Height: a.appHeight,
+			},
+		)
 
-	case "horario": // abrir mi horario actual
+    case "horario": // abrir mi horario actual TODO: continuar
 		a.Mode = inHorario
 		var err error
 		a.horario = horario.NewHorario([]excelParser.Materia{

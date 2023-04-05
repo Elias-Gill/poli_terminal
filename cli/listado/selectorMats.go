@@ -20,7 +20,7 @@ func (i itemLista) FilterValue() string { return i.Tit }
 type SelectMats struct {
 	List     list.Model
 	materias []excelParser.Materia
-	focus    int
+	focused  excelParser.Materia
 	Quit     bool
 }
 
@@ -56,16 +56,15 @@ func NewSelectorMats(f string) (SelectMats, error) {
 	return m, nil
 }
 
-func (m SelectMats) Init() (tea.Cmd) {return nil}
+func (m SelectMats) Init() tea.Cmd { return nil }
 
 func (m SelectMats) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	options := map[string]struct{}{"q": {}, "esc": {}}
+
 	// handle special events
+	filtering := m.List.FilterState().String() == "filtering"
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		filtering := m.List.FilterState().String() == "filtering"
-
-		// TODO: cuadros de info de materias
 
 		// si la tecla precionada es una de las de salir
 		_, keyExit := options[msg.String()]
@@ -78,14 +77,16 @@ func (m SelectMats) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		h, v := styles.DocStyle.GetFrameSize()
 		m.List.SetSize(msg.Width-h, msg.Height-v-6)
 	}
-
 	var cmd tea.Cmd
 	m.List, cmd = m.List.Update(msg)
+	if !filtering {
+		m.focused = m.materias[m.indexOf(m.List.SelectedItem().FilterValue())]
+	}
 	return m, cmd
 }
 
 func (m SelectMats) View() string {
-	return m.List.View() + "\n\n"
+	return m.List.View()
 }
 
 // buscar el valor seleccionado en la lista

@@ -9,6 +9,8 @@ import (
 type infoMateria struct {
 	Quit    bool
 	materia excelParser.Materia
+	width   int
+	height  int
 }
 
 func newInfoMateria(m excelParser.Materia) infoMateria {
@@ -20,6 +22,10 @@ func (i infoMateria) Init() tea.Cmd { return nil }
 func (i infoMateria) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	options := map[string]struct{}{"i": {}, "q": {}, "esc": {}}
 	switch msg := msg.(type) {
+	case tea.WindowSizeMsg:
+		i.width = msg.Width
+		i.height = msg.Height
+
 	case tea.KeyMsg:
 		// si la tecla precionada es una de las de salir
 		_, keyExit := options[msg.String()]
@@ -31,15 +37,13 @@ func (i infoMateria) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (i infoMateria) View() string {
-	res := styles.DoneStyle.Render(i.materia.Nombre) + "\n"
-	for i := 0; i < 50; i++ {
-		res += "─"
-	}
-	res += "\n" + i.materia.Profesor + "\t" +
-		"\n\n\t" + styles.GoodStyle.Render("Parcial 1: \t") + i.materia.Parcial1 + "\t" +
-		"\n\t" + styles.GoodStyle.Render("Parcial 2: \t") + i.materia.Parcial2 + "\t" +
-		"\n\n\t" + styles.GoodStyle.Render("Final 1: \t") + i.materia.Final1 + "\t" +
-		"\n\t" + styles.GoodStyle.Render("Final 2: \t") + i.materia.Final2 + "\t"
+	res := styles.DoneStyle.Render(i.materia.Profesor) +
+		"\n" + styles.GoodStyle.Render("Parciales: \t") +
+		"\n" + i.materia.Parcial1 +
+		"\n" + i.materia.Parcial2 +
+		"\n" + styles.GoodStyle.Render("Finales: \t") +
+		"\n" + i.materia.Final1 +
+		"\n" + i.materia.Final2
 
-	return styles.DocStyle.Render(res)
+	return res
 }
