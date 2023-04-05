@@ -21,7 +21,9 @@ var (
 			Bold(true).
 			Foreground(lipgloss.Color("#ae67f0"))
 
-	AuthorStyle = lipgloss.NewStyle().
-			Bold(true).
-			Foreground(lipgloss.Color("#999999"))
+	RightPanel = lipgloss.NewStyle().
+			Align(lipgloss.Right)
+
+	LeftPanel = lipgloss.NewStyle().
+			Align(lipgloss.Left)
 )

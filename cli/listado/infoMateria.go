@@ -15,7 +15,9 @@ func newInfoMateria(m excelParser.Materia) infoMateria {
 	return infoMateria{materia: m, Quit: false}
 }
 
-func (i infoMateria) Update(msg tea.Msg) (infoMateria, tea.Cmd) {
+func (i infoMateria) Init() tea.Cmd { return nil }
+
+func (i infoMateria) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	options := map[string]struct{}{"i": {}, "q": {}, "esc": {}}
 	switch msg := msg.(type) {
 	case tea.KeyMsg:

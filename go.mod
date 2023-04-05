@@ -2,13 +2,16 @@ module github.com/elias-gill/poli_terminal
 
 go 1.20
 
-require github.com/xuri/excelize/v2 v2.7.0
+require (
+	github.com/knipferrc/teacup v0.3.0
+	github.com/treilik/bubbleboxer v0.1.0
+	github.com/xuri/excelize/v2 v2.7.0
+)
 
 require (
 	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/containerd/console v1.0.3 // indirect
-	github.com/knipferrc/teacup v0.3.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/mattn/go-isatty v0.0.17 // indirect
 	github.com/mattn/go-localereader v0.0.1 // indirect

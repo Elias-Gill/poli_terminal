@@ -23,10 +23,11 @@ type App struct {
 	appWith   int
 	appHeight int
 	config    configManager.Configurations
+
 	// components
 	mainMenu     MainMenu
-	listaMats    horario.Horario
-	selectorMats *listado.SelectMats
+	horario      horario.Horario
+	selectorMats listado.Armador
 }
 
 func NewApp() App {
@@ -61,8 +62,8 @@ func (a App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// TODO: implementar
 
 	case inHorario:
-		a.listaMats, cmd = a.listaMats.Update(msg)
-		if a.listaMats.Quit {
+		a.horario, cmd = a.horario.Update(msg)
+		if a.horario.Quit {
 			a.Mode = inMenu
 		}
 
@@ -89,7 +90,7 @@ func (m App) View() string {
 		return styles.DocStyle.Render(m.selectorMats.View())
 
 	case inHorario:
-		return styles.DocStyle.Render(m.listaMats.View())
+		return styles.DocStyle.Render(m.horario.View())
 
 	case inCalendar:
 		// TODO: IMPLEMENTAR
@@ -110,16 +111,12 @@ func (a App) selectMode() (tea.Model, tea.Cmd) {
 	switch a.mainMenu.List.SelectedItem().FilterValue() {
 	case "modHorario": // abrir la lista de materias entera
 		a.Mode = inListMats
-		var err error
-		a.selectorMats, err = listado.NewSelectorMats(a.appHeight, a.appWith, a.config.FHorario)
-		if err != nil {
-			panic(err)
-		}
+		a.selectorMats = listado.NewArmador(a.config.FHorario)
 
 	case "horario": // abrir mi horario actual
 		a.Mode = inHorario
 		var err error
-		a.listaMats = horario.NewHorario([]excelParser.Materia{
+		a.horario = horario.NewHorario([]excelParser.Materia{
 			{Nombre: "materoas1"},
 			{Nombre: "materoas2"},
 			{Nombre: "materoas3"},
