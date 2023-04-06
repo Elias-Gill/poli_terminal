@@ -1,7 +1,6 @@
 package listado
 
 import (
-	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/elias-gill/poli_terminal/excelParser"
 	"github.com/elias-gill/poli_terminal/styles"
@@ -18,26 +17,25 @@ type Armador struct {
 	tui           boxer.Boxer
 	Quit          bool
 	selectorFocus bool
+	materias      []excelParser.Materia
 }
 
 func NewArmador(f string) Armador {
-	// leaf content creation (models)
+	// modelos
 	info := newInfoMateria(excelParser.Materia{})
+	lista := NewLista([]excelParser.Materia{})
 	selector, err := NewSelectorMats(f)
 	if err != nil {
 		panic("No se puede crear el selector de materias")
 	}
-	// lista := newInfoMateria(NewSelectorMats())
-	m := Armador{
-		tui: boxer.Boxer{}, selectorFocus: true,
-	}
 
 	// layout-tree defintion
+	m := Armador{tui: boxer.Boxer{}, selectorFocus: true}
 	m.tui.LayoutTree = boxer.Node{
 		// orientation
 		// Los largos de los hijos, debe coincidir con la cantidad de nodos
 		SizeFunc: func(_ boxer.Node, widthOrHeight int) []int {
-			return []int{(widthOrHeight / 2), (widthOrHeight / 2)}
+			return []int{(widthOrHeight * 2 / 3), (widthOrHeight / 3)}
 		},
 		Children: []boxer.Node{
 			// hijo 1
@@ -50,7 +48,7 @@ func NewArmador(f string) Armador {
 				},
 				Children: []boxer.Node{
 					m.tui.CreateLeaf(infoAddr, info),
-					m.tui.CreateLeaf(listaAddr, info), // TODO: materias seleccionadas
+					m.tui.CreateLeaf(listaAddr, lista),
 				},
 			},
 		},
@@ -59,9 +57,8 @@ func NewArmador(f string) Armador {
 	return m
 }
 
-func (m Armador) Init() tea.Cmd {
-	return spinner.Tick
-}
+func (m Armador) Init() tea.Cmd { return nil }
+
 func (m Armador) Update(msg tea.Msg) (Armador, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
@@ -70,6 +67,7 @@ func (m Armador) Update(msg tea.Msg) (Armador, tea.Cmd) {
 		case "q":
 			m.Quit = true
 			return m, nil
+
 		case tea.KeyTab.String():
 			m.selectorFocus = !m.selectorFocus
 		}
@@ -91,13 +89,22 @@ func (m Armador) Update(msg tea.Msg) (Armador, tea.Cmd) {
 	m.tui.ModelMap[selectAddr], cmd = m.tui.ModelMap[selectAddr].Update(msg)
 	aux := m.tui.ModelMap[selectAddr]
 	// truquito para traer la materia seleccionada
-	switch s := aux.(type) {
+	switch l := aux.(type) {
 	case SelectMats:
-		m.tui.ModelMap[infoAddr] = newInfoMateria(s.focused)
+		m.tui.ModelMap[infoAddr] = newInfoMateria(l.focused)
+		// si encima se preciono enter agregar materia
+		switch msg := msg.(type) {
+		case tea.KeyMsg:
+			switch msg.String() {
+			case "enter":
+				m.materias = append(m.materias, l.focused)
+				m.tui.ModelMap[listaAddr] = NewLista(m.materias)
+			}
+		}
 	}
-
 	return m, cmd
 }
+
 func (m Armador) View() string {
 	return m.tui.View()
 }

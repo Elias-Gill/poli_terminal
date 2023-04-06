@@ -74,8 +74,8 @@ func (m SelectMats) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case tea.WindowSizeMsg:
-		h, v := styles.DocStyle.GetFrameSize()
-		m.List.SetSize(msg.Width-h, msg.Height-v-6)
+		w, h := styles.DocStyle.GetFrameSize()
+		m.List.SetSize(msg.Width-h, msg.Height-w)
 	}
 	var cmd tea.Cmd
 	m.List, cmd = m.List.Update(msg)
