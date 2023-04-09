@@ -35,7 +35,7 @@ func getValidRows(mat [][]string) rowLimit {
 	// detemrinar el inicio
 	for i := res.inicio; i < len(mat[0]); i++ {
 		if mat[0][i] == "" {
-			res.fin = i-1
+			res.fin = i - 1
 			break
 		}
 	}
@@ -60,11 +60,12 @@ func GetListaMaterias(fname string, sheet int) ([]Materia, error) {
 	validRows := getValidRows(cols)
 	asignaturas := []Materia{}
 
-    // Comenzar a cargar la lista de asignaturas INFO: una columna mas a los examens me trae el "aula"
+	// Comenzar a cargar la lista de asignaturas INFO: una columna mas a los examens me trae el "aula"
+	cont := 0
 	for row := validRows.inicio; row < validRows.fin+1; row++ {
 		s, _ := strconv.Atoi(cols[3][row])
 		asignaturas = append(asignaturas, Materia{
-			Nombre:   string(cols[2][row]),
+			Nombre:   "#" + strconv.Itoa(cont) + "  " + string(cols[2][row]),
 			Semestre: s,
 			Seccion:  string(cols[9][row]),
 			Profesor: string(cols[13][row]) + " " + string(cols[12][row]),
@@ -73,6 +74,7 @@ func GetListaMaterias(fname string, sheet int) ([]Materia, error) {
 			Final1:   string(cols[21][row]) + " " + string(cols[22][row]),
 			Final2:   string(cols[24][row]) + " " + string(cols[25][row]),
 		})
+		cont++
 	}
 	return asignaturas, nil
 }

@@ -13,21 +13,19 @@ var baseStyle = lipgloss.NewStyle().
 	BorderStyle(lipgloss.NormalBorder()).
 	BorderForeground(lipgloss.Color("240"))
 
-type Horario struct {
+type DisplayHorario struct {
 	table    table.Model
 	Quit     bool
 }
 
-func (m Horario) Init() tea.Cmd { return nil }
+func (m DisplayHorario) Init() tea.Cmd { return nil }
 
-func (m Horario) Update(msg tea.Msg) (Horario, tea.Cmd) {
+func (m DisplayHorario) Update(msg tea.Msg) (DisplayHorario, tea.Cmd) {
 	var cmd tea.Cmd
-	options := map[string]struct{}{"q": {}, "esc": {}}
-
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		// si la tecla precionada es una de las de salir
-		_, keyExit := options[msg.String()]
+		keyExit := msg.String() == "q" || msg.String() == "esc"
 		if keyExit {
 			m.Quit = true
 			return m, nil
@@ -38,11 +36,11 @@ func (m Horario) Update(msg tea.Msg) (Horario, tea.Cmd) {
 	return m, cmd
 }
 
-func (m Horario) View() string {
+func (m DisplayHorario) View() string {
 	return baseStyle.Render(m.table.View()) + "\n"
 }
 
-func NewHorario(m []ep.Materia) Horario {
+func NewHorario(m []ep.Materia) DisplayHorario {
 	columns := []table.Column{
 		{Title: "Asignatura", Width: 18},
 		{Title: "Profesor", Width: 18},
@@ -87,7 +85,7 @@ func NewHorario(m []ep.Materia) Horario {
 		Bold(false)
 	t.SetStyles(s)
 
-	return Horario{
+	return DisplayHorario{
 		table: t,
 		Quit:  false,
 	}

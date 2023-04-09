@@ -1,11 +1,9 @@
-package listado
+package armadorHorarios
 
 import (
-	"strconv"
-
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/elias-gill/poli_terminal/excelParser"
+	ep "github.com/elias-gill/poli_terminal/excelParser"
 	"github.com/elias-gill/poli_terminal/styles"
 )
 
@@ -18,10 +16,11 @@ func (i itemLista) Description() string { return i.Desc }
 func (i itemLista) FilterValue() string { return i.Tit }
 
 type SelectMats struct {
-	List     list.Model
-	materias []excelParser.Materia
-	focused  excelParser.Materia
-	Quit     bool
+	list      list.Model
+	materias  []ep.Materia
+	Focus   ep.Materia
+	Filtering bool
+	Quit      bool
 }
 
 // WARN: cuidado con el camibo de paginas
@@ -29,7 +28,7 @@ type SelectMats struct {
 // Retorna una nueva lista de materias. En caso de no poder abrirse el archivo excel, o este no ser valido,
 // se retorna un error
 func NewSelectorMats(f string) (SelectMats, error) {
-	materias, err := excelParser.GetListaMaterias(f, 6)
+	materias, err := ep.GetListaMaterias(f, 6)
 	if err != nil {
 		return SelectMats{}, err
 	}
@@ -37,7 +36,7 @@ func NewSelectorMats(f string) (SelectMats, error) {
 	items := []list.Item{}
 	for i, mat := range materias {
 		aux := itemLista{
-			Tit:  "#" + strconv.Itoa(i) + "  " + mat.Nombre,
+			Tit:  mat.Nombre,
 			Desc: mat.Seccion + " - " + mat.Profesor,
 		}
 		items = append(items, aux)
@@ -46,12 +45,12 @@ func NewSelectorMats(f string) (SelectMats, error) {
 
 	// instanciar
 	m := SelectMats{
-		List:     list.New(items, list.NewDefaultDelegate(), 0, 0),
+		list:     list.New(items, list.NewDefaultDelegate(), 0, 0),
 		Quit:     false,
 		materias: materias,
 	}
-	m.List.Title = "Lista de asignaturas"
-	m.List.SelectedItem()
+	m.list.Title = "Lista de asignaturas"
+	m.list.SelectedItem()
 
 	return m, nil
 }
@@ -59,34 +58,23 @@ func NewSelectorMats(f string) (SelectMats, error) {
 func (m SelectMats) Init() tea.Cmd { return nil }
 
 func (m SelectMats) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	options := map[string]struct{}{"q": {}, "esc": {}}
-
 	// handle special events
-	filtering := m.List.FilterState().String() == "filtering"
+	filtering := m.list.FilterState().String() == "filtering"
 	switch msg := msg.(type) {
-	case tea.KeyMsg:
-
-		// si la tecla precionada es una de las de salir
-		_, keyExit := options[msg.String()]
-		if keyExit && !filtering {
-			m.Quit = true
-			return m, nil
-		}
-
 	case tea.WindowSizeMsg:
 		w, h := styles.DocStyle.GetFrameSize()
-		m.List.SetSize(msg.Width-h, msg.Height-w)
+		m.list.SetSize(msg.Width-h, msg.Height-w)
 	}
 	var cmd tea.Cmd
-	m.List, cmd = m.List.Update(msg)
+	m.list, cmd = m.list.Update(msg)
 	if !filtering {
-		m.focused = m.materias[m.indexOf(m.List.SelectedItem().FilterValue())]
+		m.Focus = m.materias[m.indexOf(m.list.SelectedItem().FilterValue())]
 	}
 	return m, cmd
 }
 
 func (m SelectMats) View() string {
-	return m.List.View()
+	return m.list.View()
 }
 
 // buscar el valor seleccionado en la lista

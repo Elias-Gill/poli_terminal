@@ -6,7 +6,7 @@ import (
 	"github.com/elias-gill/poli_terminal/styles"
 )
 
-func NewMainMenu() MainMenu {
+func NewMainMenu() MenuPrincipal {
 	items := []list.Item{
         menuItem{Action: "horario", Tit: "Mi horario", Desc: "Revisa tu horario semanal y las fechas de examenes"},
 		menuItem{Action: "calendario", Tit: "Calendario", Desc: "Mira en un calendario tus fechas de examenes"},
@@ -14,7 +14,7 @@ func NewMainMenu() MainMenu {
 		menuItem{Action: "salir", Tit: "Salir", Desc: "Mas vale que sea para fiestear, ehemm, estudiar..."},
 	}
 
-	m := MainMenu{List: list.New(items, list.NewDefaultDelegate(), 0, 0)}
+	m := MenuPrincipal{List: list.New(items, list.NewDefaultDelegate(), 0, 0)}
 	m.List.Title = "Mi Politerminal"
     m.List.SetFilteringEnabled(false)
 	return m
@@ -28,17 +28,17 @@ func (i menuItem) Title() string       { return i.Tit }
 func (i menuItem) Description() string { return i.Desc }
 func (i menuItem) FilterValue() string { return i.Action }
 
-type MainMenu struct {
+type MenuPrincipal struct {
 	List     list.Model
 	Selected bool
 }
 
-func (m MainMenu) Init() tea.Cmd {
+func (m MenuPrincipal) Init() tea.Cmd {
 	return nil
 }
 
 // actualizar el modelo
-func (m MainMenu) Update(msg tea.Msg) (MainMenu, tea.Cmd) {
+func (m MenuPrincipal) Update(msg tea.Msg) (MenuPrincipal, tea.Cmd) {
 	exit_keys := map[string]struct{}{"q": {}, "esc": {}, "ctrl+c": {}}
     // handle special events
 	switch msg := msg.(type) {
@@ -63,6 +63,6 @@ func (m MainMenu) Update(msg tea.Msg) (MainMenu, tea.Cmd) {
 }
 
 // mostrar menu de seleccion
-func (m MainMenu) View() string {
+func (m MenuPrincipal) View() string {
 	return m.List.View()
 }
