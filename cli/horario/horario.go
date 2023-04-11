@@ -9,13 +9,9 @@ import (
 	ep "github.com/elias-gill/poli_terminal/excelParser"
 )
 
-var baseStyle = lipgloss.NewStyle().
-	BorderStyle(lipgloss.NormalBorder()).
-	BorderForeground(lipgloss.Color("240"))
-
 type DisplayHorario struct {
-	table    table.Model
-	Quit     bool
+	table table.Model
+	Quit  bool
 }
 
 func (m DisplayHorario) Init() tea.Cmd { return nil }
@@ -37,7 +33,12 @@ func (m DisplayHorario) Update(msg tea.Msg) (DisplayHorario, tea.Cmd) {
 }
 
 func (m DisplayHorario) View() string {
-	return baseStyle.Render(m.table.View()) + "\n"
+	var baseStyle = lipgloss.NewStyle().
+		BorderStyle(lipgloss.NormalBorder()).
+		BorderForeground(lipgloss.Color("13"))
+
+	return baseStyle.Render(m.table.View()) + "\n\n" + 
+    baseStyle.Render()
 }
 
 func NewHorario(m []ep.Materia) DisplayHorario {

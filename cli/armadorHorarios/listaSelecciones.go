@@ -12,6 +12,7 @@ var baseStyle = lipgloss.NewStyle().
 	BorderForeground(lipgloss.Color("240"))
 
 type listSelecs struct {
+	color  int
 	table  table.Model
 	lista  []ep.Materia
 	height int
@@ -47,8 +48,12 @@ func (m listSelecs) Update(msg tea.Msg) (listSelecs, tea.Cmd) {
 
 func (m listSelecs) View() string {
 	var style = lipgloss.NewStyle().
-		BorderStyle(lipgloss.NormalBorder()).
-		BorderForeground(lipgloss.Color("63"))
+		BorderStyle(lipgloss.NormalBorder())
+	if m.color == 1 {
+		style.BorderForeground(lipgloss.Color("43"))
+	} else {
+		style.BorderForeground(lipgloss.Color("23"))
+	}
 	return style.Render(lipgloss.PlaceHorizontal(m.width, lipgloss.Right, m.table.View()))
 }
 

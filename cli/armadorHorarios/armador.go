@@ -55,8 +55,10 @@ func (a ArmadorHorario) Update(msg tea.Msg) (ArmadorHorario, tea.Cmd) {
 		if msg.String() == tea.KeyTab.String() {
 			if a.mode == inLista {
 				a.mode = inSelector
+                a.listaSelecs.color = 2
 			} else {
 				a.mode = inLista
+                a.listaSelecs.color = 1
 			}
 			return a, nil
 		}

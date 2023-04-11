@@ -7,6 +7,15 @@ import (
 	"github.com/xuri/excelize/v2"
 )
 
+type dias struct {
+	lunes     string
+	martes    string
+	miercoles string
+	jueves    string
+	viernes   string
+	sabado    string
+}
+
 type Materia struct {
 	Nombre   string `json:"nombre"`
 	Semestre int    `json:"semestre"`
@@ -16,6 +25,7 @@ type Materia struct {
 	Parcial2 string `json:"parcial_2"`
 	Final1   string `json:"final_1"`
 	Final2   string `json:"final_2"`
+	dias     dias
 }
 
 type rowLimit struct {
@@ -54,7 +64,7 @@ func GetListaMaterias(fname string, sheet int) ([]Materia, error) {
 	// parsear las columnas
 	cols, err := file.GetCols(file.GetSheetName(sheet))
 	if err != nil {
-        return nil, fmt.Errorf("No se pudo abrir el excel: \n" + err.Error())
+		return nil, fmt.Errorf("No se pudo abrir el excel: \n" + err.Error())
 	}
 
 	// determinar donde empieza la lista de materias
@@ -65,6 +75,16 @@ func GetListaMaterias(fname string, sheet int) ([]Materia, error) {
 	cont := 0
 	for row := validRows.inicio; row < validRows.fin+1; row++ {
 		s, _ := strconv.Atoi(cols[3][row])
+		// aislar los dias de clase
+		dias := dias{
+			lunes:     string(cols[28][row]),
+			martes:    string(cols[30][row]),
+			miercoles: string(cols[32][row]),
+			jueves:    string(cols[34][row]),
+			viernes:   string(cols[36][row]),
+			sabado:    string(cols[38][row]),
+		}
+		// armar la materia
 		asignaturas = append(asignaturas, Materia{
 			Nombre:   "#" + strconv.Itoa(cont) + "  " + string(cols[2][row]),
 			Semestre: s,
@@ -74,6 +94,7 @@ func GetListaMaterias(fname string, sheet int) ([]Materia, error) {
 			Parcial2: string(cols[18][row]) + " " + string(cols[19][row]),
 			Final1:   string(cols[21][row]) + " " + string(cols[22][row]),
 			Final2:   string(cols[24][row]) + " " + string(cols[25][row]),
+			dias:     dias,
 		})
 		cont++
 	}

@@ -61,12 +61,16 @@ func (a App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case inHorario:
 		a.horario, cmd = a.horario.Update(msg)
 		if a.horario.Quit {
+			a.mainMenu.List.SetWidth(a.appWith)
+			a.mainMenu.List.SetHeight(a.appHeight)
 			a.Mode = inMenu
 		}
 
 	case inArmarHor:
 		a.selectorMats, cmd = a.selectorMats.Update(msg)
 		if a.selectorMats.Quit {
+			a.mainMenu.List.SetWidth(a.appWith)
+			a.mainMenu.List.SetHeight(a.appHeight)
 			a.Mode = inMenu
 		}
 
