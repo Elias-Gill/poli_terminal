@@ -2,9 +2,9 @@ package armadorHorarios
 
 import (
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 	ep "github.com/elias-gill/poli_terminal/excelParser"
 	"github.com/elias-gill/poli_terminal/styles"
-	boxer "github.com/treilik/bubbleboxer"
 )
 
 const (
@@ -18,47 +18,23 @@ const (
 )
 
 type ArmadorHorario struct {
-	tui      boxer.Boxer
-	Quit     bool
-	mode     int
-	materias []ep.Materia
+	width       int
+	height      int
+	Quit        bool
+	mode        int
+	infoMat     infoMateria
+	listaSelecs listSelecs
+	selector    SelectMats
 }
 
 func NewArmador(f string) ArmadorHorario {
-	// modelos
-	info := newInfoMateria(ep.Materia{})
-	lista := NewLista([]ep.Materia{})
-	selector, err := NewSelectorMats(f)
-	if err != nil {
-		panic("No se puede crear el selector de materias")
+	return ArmadorHorario{
+		mode:        inSelector,
+		Quit:        false,
+		infoMat:     newInfoMateria(ep.Materia{}),
+		listaSelecs: newLista([]ep.Materia{}),
+		selector:    newSelectorMats(f),
 	}
-
-	// layout-tree defintion
-	m := ArmadorHorario{tui: boxer.Boxer{}, mode: inSelector}
-	m.tui.LayoutTree = boxer.Node{
-		// orientation
-		// Los largos de los hijos, debe coincidir con la cantidad de nodos
-		SizeFunc: func(_ boxer.Node, widthOrHeight int) []int {
-			return []int{(widthOrHeight * 3 / 5), (widthOrHeight * 2 / 5)}
-		},
-		Children: []boxer.Node{
-			// hijo 1
-			m.tui.CreateLeaf(selectAddr, selector),
-			// hijo 2
-			{
-				VerticalStacked: true,
-				SizeFunc: func(_ boxer.Node, widthOrHeight int) []int {
-					return []int{(widthOrHeight / 2) - 1, (widthOrHeight / 2) + 1}
-				},
-				Children: []boxer.Node{
-					m.tui.CreateLeaf(infoAddr, info),
-					m.tui.CreateLeaf(listaAddr, lista),
-				},
-			},
-		},
-	}
-
-	return m
 }
 
 func (a ArmadorHorario) Init() tea.Cmd { return nil }
@@ -67,61 +43,67 @@ func (a ArmadorHorario) Update(msg tea.Msg) (ArmadorHorario, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		switch msg.String() {
-        case "q":
-            a.Quit = true
+		// salir
+		if msg.String() == "q" {
+			if !a.selector.Filtering || a.mode == inLista {
+				a.Quit = true
+				return a, nil
+			}
+		}
 
-        // cambiar de modo
-		case tea.KeyTab.String():
+		// cambiar de modo (tab)
+		if msg.String() == tea.KeyTab.String() {
 			if a.mode == inLista {
 				a.mode = inSelector
 			} else {
 				a.mode = inLista
 			}
+			return a, nil
+		}
+
+		if a.mode == inSelector {
+            // anadir materia con enter
+			if msg.String() == "enter" && !a.selector.Filtering {
+				a.listaSelecs = a.listaSelecs.AddMateria(a.selector.Focused)
+			}
+			a.selector, cmd = a.selector.Update(msg)
+			a.infoMat = a.infoMat.ChangeMateria(a.selector.Focused)
+		}
+
+		if a.mode == inLista {
+			a.listaSelecs, cmd = a.listaSelecs.Update(msg)
 		}
 
 	case tea.WindowSizeMsg:
-		h, w := styles.DocStyle.GetFrameSize()
-		msg.Height -= h
-		msg.Width -= w
-		a.tui.UpdateSize(msg)
-	}
-
-	// si estamos en la lista de seleccionados
-	if a.mode == inLista {
-		a.tui.ModelMap[listaAddr], cmd = a.tui.ModelMap[listaAddr].Update(msg)
-		return a, cmd
-	}
-
-	// actualizar el selector
-	a.tui.ModelMap[selectAddr], cmd = a.tui.ModelMap[selectAddr].Update(msg)
-	elem := a.tui.ModelMap[selectAddr]
-	// traer la materia seleccionada
-	switch selec := elem.(type) {
-	case SelectMats:
-		// actualizar la info
-		a.tui.ModelMap[infoAddr] = newInfoMateria(selec.Focus)
-		// si se preciono enter, agregar materia
-		switch msg := msg.(type) {
-		case tea.KeyMsg:
-			switch msg.String() {
-			case "q", "esc":
-				if !selec.Filtering {
-					a.Quit = true
-					return a, nil
-				}
-
-			case "enter":
-				switch lmats := a.tui.ModelMap[listaAddr].(type) {
-				case listSelecs:
-					a.tui.ModelMap[listaAddr] = lmats.AddMateria(selec.Focus)
-				}
-			}
-		}
+		return a.UpdateSize(msg), nil
 	}
 	return a, cmd
 }
 
 func (a ArmadorHorario) View() string {
-	return a.tui.View()
+	aux := lipgloss.JoinVertical(0, a.infoMat.View(), a.listaSelecs.View())
+	return lipgloss.JoinHorizontal(0, a.selector.View(), aux)
+}
+
+// calcula los tamanos necesarios para los objetos en pantalla
+func (a ArmadorHorario) UpdateSize(m tea.WindowSizeMsg) ArmadorHorario {
+	var selector, info, lista tea.WindowSizeMsg
+	x, y := styles.DocStyle.GetFrameSize()
+	m.Height -= y
+	m.Width -= x
+
+	selector.Width = m.Width / 2
+	selector.Height = m.Height
+
+	info.Width = m.Width / 2
+	info.Height = m.Height / 2
+
+	lista.Width = m.Width / 2
+	lista.Height = m.Height / 2
+
+	a.infoMat, _ = a.infoMat.Update(info)
+	a.selector, _ = a.selector.Update(selector)
+	a.listaSelecs, _ = a.listaSelecs.Update(lista)
+
+	return a
 }

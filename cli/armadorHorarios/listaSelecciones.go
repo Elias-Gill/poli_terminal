@@ -12,51 +12,52 @@ var baseStyle = lipgloss.NewStyle().
 	BorderForeground(lipgloss.Color("240"))
 
 type listSelecs struct {
-	table table.Model
-	lista []ep.Materia
-	Quit  bool
+	table  table.Model
+	lista  []ep.Materia
+	height int
+	width  int
+	Quit   bool
 }
 
 func (m listSelecs) Init() tea.Cmd { return nil }
 
-func (m listSelecs) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m listSelecs) Update(msg tea.Msg) (listSelecs, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		if msg.String() == "x" {
 			if len(m.table.Rows()) > 0 {
 				m.table, cmd = m.table.Update(msg)
-				m.lista = m.DelMateria()
+				var i int
+				m.lista, i = m.DelMateria()
 				m.table.SetRows(m.nuevasFilas())
+				m.table.SetCursor(i)
 				return m, cmd
 			}
 		}
+	case tea.WindowSizeMsg:
+		x, y := baseStyle.GetFrameSize()
+		m.table.SetWidth(msg.Width - x)
+		m.table.SetHeight(msg.Height - y)
+		return m, cmd
 	}
 	m.table, cmd = m.table.Update(msg)
 	return m, cmd
 }
 
 func (m listSelecs) View() string {
-	return baseStyle.Render(m.table.View())
+	var style = lipgloss.NewStyle().
+		BorderStyle(lipgloss.NormalBorder()).
+		BorderForeground(lipgloss.Color("63"))
+	return style.Render(lipgloss.PlaceHorizontal(m.width, lipgloss.Right, m.table.View()))
 }
 
 // retorna una nueva lista de materias
-func NewLista(m []ep.Materia) listSelecs {
+func newLista(m []ep.Materia) listSelecs {
 	return listSelecs{
 		table: construirTabla(m),
 		Quit:  false,
 	}
-}
-
-func (l listSelecs) nuevasFilas() []table.Row {
-	rows := []table.Row{}
-	for _, v := range l.lista {
-		rows = append(rows, table.Row{
-			v.Nombre,
-			v.Seccion,
-		})
-	}
-	return rows
 }
 
 func construirTabla(m []ep.Materia) table.Model {
@@ -77,7 +78,6 @@ func construirTabla(m []ep.Materia) table.Model {
 		table.WithColumns(columns),
 		table.WithRows(rows),
 		table.WithFocused(true),
-		table.WithHeight(8),
 	)
 
 	s := table.DefaultStyles()
@@ -104,7 +104,7 @@ func (l listSelecs) AddMateria(mat ep.Materia) listSelecs {
 		}
 	}
 	l.lista = append(l.lista, mat)
-	l.table = construirTabla(l.lista)
+	l.table.SetRows(l.nuevasFilas())
 	return l
 }
 
@@ -112,13 +112,27 @@ func (l listSelecs) AddMateria(mat ep.Materia) listSelecs {
 //
 // Retorna una nueva lista y el indice donde se debe colocar de nuevo el foco
 // de la lista
-func (l listSelecs) DelMateria() []ep.Materia {
+func (l listSelecs) DelMateria() ([]ep.Materia, int) {
 	selec := l.table.SelectedRow()[0]
 	var aux []ep.Materia
-	for _, m := range l.lista {
+	index := 1
+	for i, m := range l.lista {
 		if m.Nombre != selec {
 			aux = append(aux, m)
+			continue
 		}
+		index = i
 	}
-	return aux
+	return aux, index - 1
+}
+
+func (l listSelecs) nuevasFilas() []table.Row {
+	rows := []table.Row{}
+	for _, v := range l.lista {
+		rows = append(rows, table.Row{
+			v.Nombre,
+			v.Seccion,
+		})
+	}
+	return rows
 }

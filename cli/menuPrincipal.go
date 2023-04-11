@@ -8,7 +8,7 @@ import (
 
 func NewMainMenu() MenuPrincipal {
 	items := []list.Item{
-        menuItem{Action: "horario", Tit: "Mi horario", Desc: "Revisa tu horario semanal y las fechas de examenes"},
+		menuItem{Action: "horario", Tit: "Mi horario", Desc: "Revisa tu horario semanal y las fechas de examenes"},
 		menuItem{Action: "calendario", Tit: "Calendario", Desc: "Mira en un calendario tus fechas de examenes"},
 		menuItem{Action: "modHorario", Tit: "Modificar horario", Desc: "Realiza cambios al horario o crea uno desde 0"},
 		menuItem{Action: "salir", Tit: "Salir", Desc: "Mas vale que sea para fiestear, ehemm, estudiar..."},
@@ -16,7 +16,7 @@ func NewMainMenu() MenuPrincipal {
 
 	m := MenuPrincipal{List: list.New(items, list.NewDefaultDelegate(), 0, 0)}
 	m.List.Title = "Mi Politerminal"
-    m.List.SetFilteringEnabled(false)
+	m.List.SetFilteringEnabled(false)
 	return m
 }
 
@@ -39,16 +39,14 @@ func (m MenuPrincipal) Init() tea.Cmd {
 
 // actualizar el modelo
 func (m MenuPrincipal) Update(msg tea.Msg) (MenuPrincipal, tea.Cmd) {
-	exit_keys := map[string]struct{}{"q": {}, "esc": {}, "ctrl+c": {}}
-    // handle special events
+	// handle special events
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		if msg.String() == "enter" {
 			m.Selected = true
 		}
 		// si la tecla precionada es una de las de salir
-		_, keyExit := exit_keys[msg.String()]
-		if keyExit {
+		if msg.String() == "q" || msg.String() == "esc" {
 			return m, tea.Quit
 		}
 

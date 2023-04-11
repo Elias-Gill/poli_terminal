@@ -1,6 +1,7 @@
 package excelParser
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/xuri/excelize/v2"
@@ -53,7 +54,7 @@ func GetListaMaterias(fname string, sheet int) ([]Materia, error) {
 	// parsear las columnas
 	cols, err := file.GetCols(file.GetSheetName(sheet))
 	if err != nil {
-		return nil, err
+        return nil, fmt.Errorf("No se pudo abrir el excel: \n" + err.Error())
 	}
 
 	// determinar donde empieza la lista de materias

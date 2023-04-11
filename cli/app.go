@@ -2,8 +2,8 @@ package cli
 
 import (
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/elias-gill/poli_terminal/cli/horario"
 	armHors "github.com/elias-gill/poli_terminal/cli/armadorHorarios"
+	"github.com/elias-gill/poli_terminal/cli/horario"
 	cfman "github.com/elias-gill/poli_terminal/configManager"
 	ep "github.com/elias-gill/poli_terminal/excelParser"
 	"github.com/elias-gill/poli_terminal/styles"
@@ -56,7 +56,7 @@ func (a App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	}
 
-	// handle events
+	// handle events per mode
 	switch a.Mode {
 	case inHorario:
 		a.horario, cmd = a.horario.Update(msg)
@@ -88,7 +88,6 @@ func (m App) View() string {
 
 	case inHorario:
 		return styles.DocStyle.Render(m.horario.View())
-
 	}
 	// por default se muestra el menu principal
 	return styles.DocStyle.Render(m.mainMenu.View())
@@ -114,7 +113,8 @@ func (a App) selectMode() (tea.Model, tea.Cmd) {
 			},
 		)
 
-    case "horario": // abrir mi horario actual TODO: continuar
+		// TODO: continuar
+	case "horario": // abrir mi horario actual
 		a.Mode = inHorario
 		var err error
 		a.horario = horario.NewHorario([]ep.Materia{
@@ -126,9 +126,8 @@ func (a App) selectMode() (tea.Model, tea.Cmd) {
 			panic(err)
 		}
 
-	case "calendario": // abrir el calendario TODO: IMPLEMENTAR
-		// a.Mode = inCalendar
-
+	case "calendario": // abrir el calendario
+		// TODO: IMPLEMENTAR
 	}
 	return a, cmd
 }

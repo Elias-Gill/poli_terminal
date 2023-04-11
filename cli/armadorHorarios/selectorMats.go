@@ -3,8 +3,8 @@ package armadorHorarios
 import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 	ep "github.com/elias-gill/poli_terminal/excelParser"
-	"github.com/elias-gill/poli_terminal/styles"
 )
 
 type itemLista struct {
@@ -18,29 +18,29 @@ func (i itemLista) FilterValue() string { return i.Tit }
 type SelectMats struct {
 	list      list.Model
 	materias  []ep.Materia
-	Focus   ep.Materia
+	Focused   ep.Materia
 	Filtering bool
 	Quit      bool
+	width     int
+	height    int
 }
 
 // WARN: cuidado con el camibo de paginas
 //
 // Retorna una nueva lista de materias. En caso de no poder abrirse el archivo excel, o este no ser valido,
 // se retorna un error
-func NewSelectorMats(f string) (SelectMats, error) {
+func newSelectorMats(f string) SelectMats {
 	materias, err := ep.GetListaMaterias(f, 6)
 	if err != nil {
-		return SelectMats{}, err
+        panic(err)
 	}
 	// Cargar las materias disponibles
 	items := []list.Item{}
-	for i, mat := range materias {
-		aux := itemLista{
+	for _, mat := range materias {
+		items = append(items, itemLista{
 			Tit:  mat.Nombre,
 			Desc: mat.Seccion + " - " + mat.Profesor,
-		}
-		items = append(items, aux)
-		materias[i].Nombre = aux.FilterValue()
+		})
 	}
 
 	// instanciar
@@ -50,31 +50,33 @@ func NewSelectorMats(f string) (SelectMats, error) {
 		materias: materias,
 	}
 	m.list.Title = "Lista de asignaturas"
-	m.list.SelectedItem()
 
-	return m, nil
+	return m
 }
 
 func (m SelectMats) Init() tea.Cmd { return nil }
 
-func (m SelectMats) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m SelectMats) Update(msg tea.Msg) (SelectMats, tea.Cmd) {
+	var cmd tea.Cmd
 	// handle special events
-	filtering := m.list.FilterState().String() == "filtering"
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		w, h := styles.DocStyle.GetFrameSize()
-		m.list.SetSize(msg.Width-h, msg.Height-w)
+		m.list.SetSize(msg.Width, msg.Height)
+		m.height = msg.Height
+		m.width = msg.Width
+		return m, cmd
 	}
-	var cmd tea.Cmd
+
 	m.list, cmd = m.list.Update(msg)
-	if !filtering {
-		m.Focus = m.materias[m.indexOf(m.list.SelectedItem().FilterValue())]
+    m.Filtering = m.list.FilterState().String() == "filtering"
+	if !m.Filtering {
+		m.Focused = m.materias[m.indexOf(m.list.SelectedItem().FilterValue())]
 	}
 	return m, cmd
 }
 
 func (m SelectMats) View() string {
-	return m.list.View()
+	return lipgloss.PlaceHorizontal(m.width, lipgloss.Left, m.list.View())
 }
 
 // buscar el valor seleccionado en la lista
