@@ -16,6 +16,7 @@ func (i itemLista) Description() string { return i.Desc }
 func (i itemLista) FilterValue() string { return i.Tit }
 
 type SelectMats struct {
+	Selected  bool
 	list      list.Model
 	materias  []ep.Materia
 	Focused   ep.Materia
@@ -32,7 +33,7 @@ type SelectMats struct {
 func newSelectorMats(f string) SelectMats {
 	materias, err := ep.GetListaMaterias(f, 6)
 	if err != nil {
-        panic(err)
+		panic(err)
 	}
 	// Cargar las materias disponibles
 	items := []list.Item{}
@@ -48,6 +49,7 @@ func newSelectorMats(f string) SelectMats {
 		list:     list.New(items, list.NewDefaultDelegate(), 0, 0),
 		Quit:     false,
 		materias: materias,
+		Selected: false,
 	}
 	m.list.Title = "Lista de asignaturas"
 
@@ -60,6 +62,13 @@ func (m SelectMats) Update(msg tea.Msg) (SelectMats, tea.Cmd) {
 	var cmd tea.Cmd
 	// handle special events
 	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		f := m.list.FilterState().String() == "filtering"
+		if msg.String() == "enter" && !f {
+			m.Selected = true
+			return m, cmd
+		}
+
 	case tea.WindowSizeMsg:
 		m.list.SetSize(msg.Width, msg.Height)
 		m.height = msg.Height
@@ -68,7 +77,7 @@ func (m SelectMats) Update(msg tea.Msg) (SelectMats, tea.Cmd) {
 	}
 
 	m.list, cmd = m.list.Update(msg)
-    m.Filtering = m.list.FilterState().String() == "filtering"
+	m.Filtering = m.list.FilterState().String() == "filtering"
 	if !m.Filtering {
 		m.Focused = m.materias[m.indexOf(m.list.SelectedItem().FilterValue())]
 	}

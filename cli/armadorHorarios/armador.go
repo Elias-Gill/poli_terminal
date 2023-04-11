@@ -61,22 +61,28 @@ func (a ArmadorHorario) Update(msg tea.Msg) (ArmadorHorario, tea.Cmd) {
 			return a, nil
 		}
 
-		if a.mode == inSelector {
-            // anadir materia con enter
-			if msg.String() == "enter" && !a.selector.Filtering {
-				a.listaSelecs = a.listaSelecs.AddMateria(a.selector.Focused)
-			}
-			a.selector, cmd = a.selector.Update(msg)
-			a.infoMat = a.infoMat.ChangeMateria(a.selector.Focused)
-		}
-
-		if a.mode == inLista {
-			a.listaSelecs, cmd = a.listaSelecs.Update(msg)
-		}
-
 	case tea.WindowSizeMsg:
 		return a.UpdateSize(msg), nil
 	}
+
+	if a.mode == inSelector {
+		// anadir materia con enter
+		a.selector, cmd = a.selector.Update(msg)
+		if !a.selector.Filtering {
+			if a.selector.Selected {
+				a.listaSelecs = a.listaSelecs.AddMateria(a.selector.Focused)
+				a.selector.Selected = false
+			}
+			a.infoMat = a.infoMat.ChangeMateria(a.selector.Focused)
+		}
+		return a, cmd
+	}
+
+	if a.mode == inLista {
+		a.listaSelecs, cmd = a.listaSelecs.Update(msg)
+		return a, cmd
+	}
+
 	return a, cmd
 }
 
