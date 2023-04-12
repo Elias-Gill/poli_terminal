@@ -7,13 +7,13 @@ import (
 	"github.com/xuri/excelize/v2"
 )
 
-type dias struct {
-	lunes     string
-	martes    string
-	miercoles string
-	jueves    string
-	viernes   string
-	sabado    string
+type Dias struct {
+	Lunes     string
+	Martes    string
+	Miercoles string
+	Jueves    string
+	Viernes   string
+	Sabado    string
 }
 
 type Materia struct {
@@ -25,7 +25,7 @@ type Materia struct {
 	Parcial2 string `json:"parcial_2"`
 	Final1   string `json:"final_1"`
 	Final2   string `json:"final_2"`
-	dias     dias
+	Dias     Dias
 }
 
 type rowLimit struct {
@@ -76,13 +76,13 @@ func GetListaMaterias(fname string, sheet int) ([]Materia, error) {
 	for row := validRows.inicio; row < validRows.fin+1; row++ {
 		s, _ := strconv.Atoi(cols[3][row])
 		// aislar los dias de clase
-		dias := dias{
-			lunes:     string(cols[28][row]),
-			martes:    string(cols[30][row]),
-			miercoles: string(cols[32][row]),
-			jueves:    string(cols[34][row]),
-			viernes:   string(cols[36][row]),
-			sabado:    string(cols[38][row]),
+		dias := Dias{
+			Lunes:     string(cols[28][row]),
+			Martes:    string(cols[30][row]),
+			Miercoles: string(cols[32][row]),
+			Jueves:    string(cols[34][row]),
+			Viernes:   string(cols[36][row]),
+			Sabado:    string(cols[38][row]),
 		}
 		// armar la materia
 		asignaturas = append(asignaturas, Materia{
@@ -94,7 +94,7 @@ func GetListaMaterias(fname string, sheet int) ([]Materia, error) {
 			Parcial2: string(cols[18][row]) + " " + string(cols[19][row]),
 			Final1:   string(cols[21][row]) + " " + string(cols[22][row]),
 			Final2:   string(cols[24][row]) + " " + string(cols[25][row]),
-			dias:     dias,
+			Dias:     dias,
 		})
 		cont++
 	}

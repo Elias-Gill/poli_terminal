@@ -1,8 +1,6 @@
 package horario
 
 import (
-	"strconv"
-
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -10,8 +8,9 @@ import (
 )
 
 type DisplayHorario struct {
-	table table.Model
-	Quit  bool
+	tablaMats table.Model
+	tablaDias table.Model
+	Quit      bool
 }
 
 func (m DisplayHorario) Init() tea.Cmd { return nil }
@@ -28,24 +27,77 @@ func (m DisplayHorario) Update(msg tea.Msg) (DisplayHorario, tea.Cmd) {
 		}
 	}
 
-	m.table, cmd = m.table.Update(msg)
+	m.tablaMats, cmd = m.tablaMats.Update(msg)
 	return m, cmd
 }
 
 func (m DisplayHorario) View() string {
 	var baseStyle = lipgloss.NewStyle().
 		BorderStyle(lipgloss.NormalBorder()).
-		BorderForeground(lipgloss.Color("13"))
+		BorderForeground(lipgloss.Color("23"))
 
-	return baseStyle.Render(m.table.View()) + "\n\n" + 
-    baseStyle.Render()
+	return baseStyle.Render(m.tablaDias.View()) + "\n\n" +
+		baseStyle.Render(m.tablaMats.View())
 }
 
 func NewHorario(m []ep.Materia) DisplayHorario {
+	return DisplayHorario{
+		tablaMats: nuevaTablaMats(m),
+		tablaDias: nuevaTablaDias(m),
+		Quit:      false,
+	}
+}
+
+func nuevaTablaDias(m []ep.Materia) table.Model {
+	columns := []table.Column{
+		{Title: "", Width: 18},
+		{Title: "Lunes", Width: 18},
+		{Title: "Martes", Width: 18},
+		{Title: "Miercoles", Width: 18},
+		{Title: "Jueves", Width: 18},
+		{Title: "Viernes", Width: 18},
+		{Title: "Sabado", Width: 18},
+	}
+
+	rows := []table.Row{}
+	for _, v := range m {
+		rows = append(rows, table.Row{
+			v.Nombre,
+			v.Dias.Lunes,
+			v.Dias.Martes,
+			v.Dias.Miercoles,
+			v.Dias.Jueves,
+			v.Dias.Viernes,
+			v.Dias.Sabado,
+		})
+	}
+
+	t := table.New(
+		table.WithColumns(columns),
+		table.WithRows(rows),
+		table.WithFocused(true),
+		table.WithHeight(8),
+	)
+
+	s := table.DefaultStyles()
+	s.Header = s.Header.
+		BorderStyle(lipgloss.NormalBorder()).
+		BorderForeground(lipgloss.Color("240")).
+		BorderBottom(true).
+		Bold(false)
+	s.Selected = s.Selected.
+		Foreground(lipgloss.Color("229")).
+		Background(lipgloss.Color("57")).
+		Bold(false)
+	t.SetStyles(s)
+
+	return t
+}
+
+func nuevaTablaMats(m []ep.Materia) table.Model {
 	columns := []table.Column{
 		{Title: "Asignatura", Width: 18},
 		{Title: "Profesor", Width: 18},
-		{Title: "Semestre", Width: 8},
 		{Title: "Seccion", Width: 7},
 		{Title: "Parcial 1", Width: 18},
 		{Title: "Parcial 2", Width: 18},
@@ -58,7 +110,6 @@ func NewHorario(m []ep.Materia) DisplayHorario {
 		rows = append(rows, table.Row{
 			v.Nombre,
 			v.Profesor,
-			strconv.Itoa(v.Semestre),
 			v.Seccion,
 			v.Parcial1,
 			v.Parcial2,
@@ -86,8 +137,5 @@ func NewHorario(m []ep.Materia) DisplayHorario {
 		Bold(false)
 	t.SetStyles(s)
 
-	return DisplayHorario{
-		table: t,
-		Quit:  false,
-	}
+	return t
 }
