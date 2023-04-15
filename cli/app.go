@@ -132,6 +132,9 @@ func (a App) selectMode() (tea.Model, tea.Cmd) {
 
 	case "calendario": // abrir el calendario
 		// TODO: IMPLEMENTAR
+
+    case "salir":
+        return a, tea.Quit
 	}
 	return a, cmd
 }

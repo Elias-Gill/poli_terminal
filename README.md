@@ -15,3 +15,4 @@ mayor responsibidad, velocidad, y un diseño mas amigable con el usuario.
 * [ ] Calculadora de notas
 * [ ] Posibilidad de administrar varios horarios al mismo tiempo
 * [ ] Conectividad con servicios de google
+* [ ] Conectividad con calendario de EDUCA
