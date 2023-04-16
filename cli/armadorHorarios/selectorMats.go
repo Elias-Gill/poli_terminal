@@ -81,7 +81,7 @@ func (m SelectMats) Update(msg tea.Msg) (SelectMats, tea.Cmd) {
 	if !m.Filtering {
 		m.Focused = m.materias[m.indexOf(m.list.SelectedItem().FilterValue())]
 	}
-	return m, cmd
+	return m, nil
 }
 
 func (m SelectMats) View() string {

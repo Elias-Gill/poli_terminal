@@ -3,6 +3,8 @@ package armadorHorarios
 import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	pts "github.com/elias-gill/poli_terminal/cli/promts"
+	cfm "github.com/elias-gill/poli_terminal/configManager"
 	ep "github.com/elias-gill/poli_terminal/excelParser"
 	"github.com/elias-gill/poli_terminal/styles"
 )
@@ -15,6 +17,7 @@ const (
 const (
 	inSelector = iota
 	inLista
+	inPrompt
 )
 
 type ArmadorHorario struct {
@@ -22,6 +25,8 @@ type ArmadorHorario struct {
 	height      int
 	Quit        bool
 	mode        int
+	file        string
+	promt       pts.Prompt
 	infoMat     infoMateria
 	listaSelecs listSelecs
 	selector    SelectMats
@@ -30,6 +35,7 @@ type ArmadorHorario struct {
 func NewArmador(f string) ArmadorHorario {
 	return ArmadorHorario{
 		mode:        inSelector,
+		file:        f,
 		Quit:        false,
 		infoMat:     newInfoMateria(ep.Materia{}),
 		listaSelecs: newLista([]ep.Materia{}),
@@ -44,26 +50,46 @@ func (a ArmadorHorario) Update(msg tea.Msg) (ArmadorHorario, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		// salir
-		if msg.String() == "q" {
+		if msg.String() == "q" || msg.String() == tea.KeyEsc.String() {
 			if !a.selector.Filtering || a.mode == inLista {
+				a.mode = inPrompt
+				a.promt = pts.NewPrompt("Seguro que quieres salir ?")
+				return a, nil
+			}
+		}
+
+		// pregunta de salida
+		if a.mode == inPrompt {
+			if msg.String() == "enter" {
+				cfm.WriteUserConfig(
+					cfm.Configurations{
+						Materias: a.listaSelecs.lista,
+						FHorario: a.file,
+					})
 				a.Quit = true
 				return a, nil
 			}
+			a.promt = a.promt.Update(msg)
+			return a, nil
 		}
 
 		// cambiar de modo (tab)
 		if msg.String() == tea.KeyTab.String() {
 			if a.mode == inLista {
 				a.mode = inSelector
-                a.listaSelecs.color = 2
+				a.listaSelecs.color = 2
 			} else {
 				a.mode = inLista
-                a.listaSelecs.color = 1
+				a.listaSelecs.color = 1
 			}
 			return a, nil
 		}
 
 	case tea.WindowSizeMsg:
+		if a.mode == inPrompt {
+			a.promt = a.promt.Update(msg)
+			return a, nil
+		}
 		return a.UpdateSize(msg), nil
 	}
 
@@ -89,6 +115,9 @@ func (a ArmadorHorario) Update(msg tea.Msg) (ArmadorHorario, tea.Cmd) {
 }
 
 func (a ArmadorHorario) View() string {
+	if a.mode == inPrompt {
+		return a.promt.View()
+	}
 	aux := lipgloss.JoinVertical(0, a.infoMat.View(), a.listaSelecs.View())
 	return lipgloss.JoinHorizontal(0, a.selector.View(), aux)
 }

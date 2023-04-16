@@ -5,7 +5,6 @@ import (
 	armHors "github.com/elias-gill/poli_terminal/cli/armadorHorarios"
 	"github.com/elias-gill/poli_terminal/cli/horario"
 	cfman "github.com/elias-gill/poli_terminal/configManager"
-	ep "github.com/elias-gill/poli_terminal/excelParser"
 	"github.com/elias-gill/poli_terminal/styles"
 )
 
@@ -121,11 +120,7 @@ func (a App) selectMode() (tea.Model, tea.Cmd) {
 	case "horario": // abrir mi horario actual
 		a.Mode = inHorario
 		var err error
-		a.horario = horario.NewHorario([]ep.Materia{
-			{Nombre: "materoas1"},
-			{Nombre: "materoas2"},
-			{Nombre: "materoas3"},
-		})
+		a.horario = horario.NewHorario()
 		if err != nil {
 			panic(err)
 		}

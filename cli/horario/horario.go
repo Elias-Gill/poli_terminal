@@ -4,6 +4,7 @@ import (
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/elias-gill/poli_terminal/configManager"
 	ep "github.com/elias-gill/poli_terminal/excelParser"
 )
 
@@ -40,7 +41,8 @@ func (m DisplayHorario) View() string {
 		baseStyle.Render(m.tablaMats.View())
 }
 
-func NewHorario(m []ep.Materia) DisplayHorario {
+func NewHorario() DisplayHorario {
+	m := configManager.GetUserConfig().Materias
 	return DisplayHorario{
 		tablaMats: nuevaTablaMats(m),
 		tablaDias: nuevaTablaDias(m),

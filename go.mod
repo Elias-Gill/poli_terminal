@@ -4,7 +4,6 @@ go 1.20
 
 require (
 	github.com/knipferrc/teacup v0.3.0
-	github.com/treilik/bubbleboxer v0.1.0
 	github.com/xuri/excelize/v2 v2.7.0
 )
 
