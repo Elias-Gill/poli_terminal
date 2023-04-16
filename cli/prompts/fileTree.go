@@ -1,4 +1,4 @@
-package configManager
+package prompts
 
 import (
 	tea "github.com/charmbracelet/bubbletea"

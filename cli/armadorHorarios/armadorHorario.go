@@ -3,7 +3,7 @@ package armadorHorarios
 import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	pts "github.com/elias-gill/poli_terminal/cli/promts"
+	pts "github.com/elias-gill/poli_terminal/cli/prompts"
 	cfm "github.com/elias-gill/poli_terminal/configManager"
 	ep "github.com/elias-gill/poli_terminal/excelParser"
 	"github.com/elias-gill/poli_terminal/styles"
@@ -26,7 +26,7 @@ type ArmadorHorario struct {
 	Quit        bool
 	mode        int
 	file        string
-	promt       pts.Prompt
+	prompt      pts.Prompt
 	infoMat     infoMateria
 	listaSelecs listSelecs
 	selector    SelectMats
@@ -53,7 +53,7 @@ func (a ArmadorHorario) Update(msg tea.Msg) (ArmadorHorario, tea.Cmd) {
 		if msg.String() == "q" || msg.String() == tea.KeyEsc.String() {
 			if !a.selector.Filtering || a.mode == inLista {
 				a.mode = inPrompt
-				a.promt = pts.NewPrompt("Seguro que quieres salir ?")
+				a.prompt = pts.NewPrompt("Seguro que quieres salir ?")
 				return a, nil
 			}
 		}
@@ -69,7 +69,7 @@ func (a ArmadorHorario) Update(msg tea.Msg) (ArmadorHorario, tea.Cmd) {
 				a.Quit = true
 				return a, nil
 			}
-			a.promt = a.promt.Update(msg)
+			a.prompt = a.prompt.Update(msg)
 			return a, nil
 		}
 
@@ -87,7 +87,7 @@ func (a ArmadorHorario) Update(msg tea.Msg) (ArmadorHorario, tea.Cmd) {
 
 	case tea.WindowSizeMsg:
 		if a.mode == inPrompt {
-			a.promt = a.promt.Update(msg)
+			a.prompt = a.prompt.Update(msg)
 			return a, nil
 		}
 		return a.UpdateSize(msg), nil
@@ -116,7 +116,7 @@ func (a ArmadorHorario) Update(msg tea.Msg) (ArmadorHorario, tea.Cmd) {
 
 func (a ArmadorHorario) View() string {
 	if a.mode == inPrompt {
-		return a.promt.View()
+		return a.prompt.View()
 	}
 	aux := lipgloss.JoinVertical(0, a.infoMat.View(), a.listaSelecs.View())
 	return lipgloss.JoinHorizontal(0, a.selector.View(), aux)

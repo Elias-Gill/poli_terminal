@@ -7,6 +7,10 @@ import (
 	"github.com/xuri/excelize/v2"
 )
 
+var (
+    excelFile *excelize.File
+)
+
 type Dias struct {
 	Lunes     string
 	Martes    string
@@ -53,16 +57,26 @@ func getValidRows(mat [][]string) rowLimit {
 	return res
 }
 
+// close the excel file gracefully
+func CloseExcel() {
+	excelFile.Close()
+}
+
+func OpenExcelFile(fname string) error {
+	// abrir el archivo excel
+	var err error
+	excelFile, err = excelize.OpenFile(fname)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // retorna la lista de materias de la carrera con fechas de finales, semestre,
 // parciales, profesor y seccion
 func GetListaMaterias(fname string, sheet int) ([]Materia, error) {
-	// abrir el archivo excel
-	file, err := excelize.OpenFile(fname)
-	if err != nil {
-		return nil, err
-	}
 	// parsear las columnas
-	cols, err := file.GetCols(file.GetSheetName(sheet))
+	cols, err := excelFile.GetCols(excelFile.GetSheetName(sheet))
 	if err != nil {
 		return nil, fmt.Errorf("No se pudo abrir el excel: \n" + err.Error())
 	}

@@ -27,7 +27,6 @@ type SelectMats struct {
 }
 
 // WARN: cuidado con el camibo de paginas
-//
 // Retorna una nueva lista de materias. En caso de no poder abrirse el archivo excel, o este no ser valido,
 // se retorna un error
 func newSelectorMats(f string) SelectMats {

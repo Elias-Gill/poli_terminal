@@ -5,6 +5,7 @@ import (
 	armHors "github.com/elias-gill/poli_terminal/cli/armadorHorarios"
 	"github.com/elias-gill/poli_terminal/cli/horario"
 	cfman "github.com/elias-gill/poli_terminal/configManager"
+	"github.com/elias-gill/poli_terminal/excelParser"
 	"github.com/elias-gill/poli_terminal/styles"
 )
 
@@ -51,6 +52,7 @@ func (a App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	// salir
 	case tea.KeyMsg:
 		if msg.String() == tea.KeyCtrlC.String() {
+            excelParser.CloseExcel()
 			return a, tea.Quit
 		}
 	}
