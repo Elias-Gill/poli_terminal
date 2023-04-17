@@ -42,7 +42,7 @@ func (m DisplayHorario) View() string {
 }
 
 func NewHorario() DisplayHorario {
-	m := configManager.GetUserConfig().Materias
+	m := configManager.GetUserConfig().MateriasUsuario
 	return DisplayHorario{
 		tablaMats: nuevaTablaMats(m),
 		tablaDias: nuevaTablaDias(m),

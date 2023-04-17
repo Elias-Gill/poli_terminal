@@ -4,7 +4,6 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	pts "github.com/elias-gill/poli_terminal/cli/prompts"
-	cfm "github.com/elias-gill/poli_terminal/configManager"
 	ep "github.com/elias-gill/poli_terminal/excelParser"
 	"github.com/elias-gill/poli_terminal/styles"
 )
@@ -61,11 +60,7 @@ func (a ArmadorHorario) Update(msg tea.Msg) (ArmadorHorario, tea.Cmd) {
 		// pregunta de salida
 		if a.mode == inPrompt {
 			if msg.String() == "enter" {
-				cfm.WriteUserConfig(
-					cfm.Configurations{
-						Materias: a.listaSelecs.lista,
-						FHorario: a.file,
-					})
+                // TODO: escribir la nueva config
 				a.Quit = true
 				return a, nil
 			}

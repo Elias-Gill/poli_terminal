@@ -4,6 +4,7 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	cfm "github.com/elias-gill/poli_terminal/configManager"
 	ep "github.com/elias-gill/poli_terminal/excelParser"
 )
 
@@ -26,14 +27,10 @@ type SelectMats struct {
 	height    int
 }
 
-// WARN: cuidado con el camibo de paginas
 // Retorna una nueva lista de materias. En caso de no poder abrirse el archivo excel, o este no ser valido,
 // se retorna un error
 func newSelectorMats(f string) SelectMats {
-	materias, err := ep.GetListaMaterias(f, 6)
-	if err != nil {
-		panic(err)
-	}
+	materias := cfm.GetUserConfig().MateriasExcel
 	// Cargar las materias disponibles
 	items := []list.Item{}
 	for _, mat := range materias {
@@ -62,8 +59,8 @@ func (m SelectMats) Update(msg tea.Msg) (SelectMats, tea.Cmd) {
 	// handle special events
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		f := m.list.FilterState().String() == "filtering"
-		if msg.String() == "enter" && !f {
+		filtering := m.list.FilterState().String() == "filtering"
+		if msg.String() == "enter" && !filtering && m.Focused.Nombre != "" {
 			m.Selected = true
 			return m, cmd
 		}

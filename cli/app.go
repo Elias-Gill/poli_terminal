@@ -5,7 +5,6 @@ import (
 	armHors "github.com/elias-gill/poli_terminal/cli/armadorHorarios"
 	"github.com/elias-gill/poli_terminal/cli/horario"
 	cfman "github.com/elias-gill/poli_terminal/configManager"
-	"github.com/elias-gill/poli_terminal/excelParser"
 	"github.com/elias-gill/poli_terminal/styles"
 )
 
@@ -21,7 +20,7 @@ type App struct {
 	Mode      int
 	appWith   int
 	appHeight int
-	config    cfman.Configurations
+	config    *cfman.Configurations
 
 	// components
 	mainMenu     MenuPrincipal
@@ -52,7 +51,6 @@ func (a App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	// salir
 	case tea.KeyMsg:
 		if msg.String() == tea.KeyCtrlC.String() {
-            excelParser.CloseExcel()
 			return a, tea.Quit
 		}
 	}
@@ -109,7 +107,7 @@ func (a App) selectMode() (tea.Model, tea.Cmd) {
 	switch a.mainMenu.List.SelectedItem().FilterValue() {
 	case "modHorario": // abrir la lista de materias entera
 		a.Mode = inArmarHor
-		a.selectorMats = armHors.NewArmador(a.config.FHorario)
+		a.selectorMats = armHors.NewArmador(a.config.ExcelFile)
 		// truco para mandar informacion de tamano
 		a.selectorMats, _ = a.selectorMats.Update(
 			tea.WindowSizeMsg{
@@ -118,9 +116,9 @@ func (a App) selectMode() (tea.Model, tea.Cmd) {
 			},
 		)
 
-		// TODO: continuar
 	case "horario": // abrir mi horario actual
 		a.Mode = inHorario
+		// TODO: continuar
 		var err error
 		a.horario = horario.NewHorario()
 		if err != nil {
@@ -130,8 +128,8 @@ func (a App) selectMode() (tea.Model, tea.Cmd) {
 	case "calendario": // abrir el calendario
 		// TODO: IMPLEMENTAR
 
-    case "salir":
-        return a, tea.Quit
+	case "salir":
+		return a, tea.Quit
 	}
 	return a, cmd
 }

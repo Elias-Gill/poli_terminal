@@ -7,10 +7,6 @@ import (
 	"github.com/xuri/excelize/v2"
 )
 
-var (
-    excelFile *excelize.File
-)
-
 type Dias struct {
 	Lunes     string
 	Martes    string
@@ -21,14 +17,17 @@ type Dias struct {
 }
 
 type Materia struct {
+    // general
 	Nombre   string `json:"nombre"`
 	Semestre int    `json:"semestre"`
 	Seccion  string `json:"seccion"`
 	Profesor string `json:"profesor"`
+    // examenes
 	Parcial1 string `json:"parcial_1"`
 	Parcial2 string `json:"parcial_2"`
 	Final1   string `json:"final_1"`
 	Final2   string `json:"final_2"`
+    // horario de clase
 	Dias     Dias
 }
 
@@ -57,35 +56,37 @@ func getValidRows(mat [][]string) rowLimit {
 	return res
 }
 
-// close the excel file gracefully
-func CloseExcel() {
-	excelFile.Close()
-}
-
-func OpenExcelFile(fname string) error {
+func openExcelFile(fname string) (*excelize.File, error) {
 	// abrir el archivo excel
 	var err error
-	excelFile, err = excelize.OpenFile(fname)
+	excelFile, err := excelize.OpenFile(fname)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return excelFile, nil
 }
 
-// retorna la lista de materias de la carrera con fechas de finales, semestre,
+// Retorna la lista de materias de la carrera con fechas de finales, semestre,
 // parciales, profesor y seccion
-func GetListaMaterias(fname string, sheet int) ([]Materia, error) {
+func Parse(fname string, sheet int) ([]Materia, error) {
+	excelFile, err := openExcelFile(fname)
+	if err != nil {
+		return nil, err
+	}
+	defer excelFile.Close()
+
 	// parsear las columnas
 	cols, err := excelFile.GetCols(excelFile.GetSheetName(sheet))
 	if err != nil {
 		return nil, fmt.Errorf("No se pudo abrir el excel: \n" + err.Error())
 	}
+	defer excelFile.Close()
 
 	// determinar donde empieza la lista de materias
 	validRows := getValidRows(cols)
 	asignaturas := []Materia{}
 
-	// Comenzar a cargar la lista de asignaturas INFO: una columna mas a los examens me trae el "aula"
+	// Comenzar a cargar la lista de asignaturas
 	cont := 0
 	for row := validRows.inicio; row < validRows.fin+1; row++ {
 		s, _ := strconv.Atoi(cols[3][row])
