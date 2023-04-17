@@ -25,7 +25,7 @@ type App struct {
 	// components
 	mainMenu     MenuPrincipal
 	horario      horario.DisplayHorario
-	selectorMats armHors.ArmadorHorario
+	armador armHors.ArmadorHorario
 }
 
 func NewApp() App {
@@ -66,8 +66,8 @@ func (a App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case inArmarHor:
-		a.selectorMats, cmd = a.selectorMats.Update(msg)
-		if a.selectorMats.Quit {
+		a.armador, cmd = a.armador.Update(msg)
+		if a.armador.Quit {
 			a.mainMenu.List.SetWidth(a.appWith)
 			a.mainMenu.List.SetHeight(a.appHeight)
 			a.Mode = inMenu
@@ -87,7 +87,7 @@ func (a App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m App) View() string {
 	switch m.Mode {
 	case inArmarHor:
-		return styles.DocStyle.Render(m.selectorMats.View())
+		return styles.DocStyle.Render(m.armador.View())
 
 	case inHorario:
 		return styles.DocStyle.Render(m.horario.View())
@@ -107,9 +107,9 @@ func (a App) selectMode() (tea.Model, tea.Cmd) {
 	switch a.mainMenu.List.SelectedItem().FilterValue() {
 	case "modHorario": // abrir la lista de materias entera
 		a.Mode = inArmarHor
-		a.selectorMats = armHors.NewArmador()
+		a.armador = armHors.NewArmador()
 		// truco para mandar informacion de tamano
-		a.selectorMats, _ = a.selectorMats.Update(
+		a.armador, _ = a.armador.Update(
 			tea.WindowSizeMsg{
 				Width:  a.appWith,
 				Height: a.appHeight,

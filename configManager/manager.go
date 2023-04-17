@@ -11,10 +11,10 @@ import (
 // Configuracion general del usuario. Estos datos son almacenados en el
 // archivo de configuracion
 type Configurations struct {
-	ExcelFile       string       `json:"file_horario"`
+	ExcelFile       string        `json:"file_horario"`
 	MateriasUsuario []*ep.Materia `json:"lista_materias"`
 	MateriasExcel   []*ep.Materia `json:"lista_excel"`
-	Sheet           int          `json:"sheet_number"`
+	Sheet           int           `json:"sheet_number"`
 }
 
 var usersConfig = LoadUserConfig()
@@ -57,8 +57,11 @@ func LoadUserConfig() *Configurations {
 	// parsear
 	var config Configurations
 	json.NewDecoder(file).Decode(&config)
-	// cargar las materias del excel TODO: cambio de carrera (sheet)
-	config.MateriasExcel, _ = ep.Parse(config.ExcelFile, config.Sheet)
+    // si el excel no esta "chacheado"
+	if config.MateriasExcel == nil {
+		// cargar las materias del excel TODO: cambio de carrera (sheet)
+		config.MateriasExcel, _ = ep.Parse(config.ExcelFile, config.Sheet)
+	}
 	return &config
 }
 

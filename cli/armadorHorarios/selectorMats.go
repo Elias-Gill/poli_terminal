@@ -17,14 +17,16 @@ func (i itemLista) Description() string { return i.Desc }
 func (i itemLista) FilterValue() string { return i.Tit }
 
 type selectMats struct {
-	IsSelected bool // Determina si se selecciono una materia ("enter")
 	list       list.Model
-	materias   []*ep.Materia
-	Focused    *ep.Materia
-	Filtering  bool
-	Quit       bool
 	width      int
 	height     int
+    // estados
+	IsSelected bool // Determina si se selecciono una materia ("enter")
+	Filtering  bool
+	Quit       bool
+    // materias
+	materias   []*ep.Materia
+	Focused    *ep.Materia
 }
 
 // Retorna una nueva lista de materias. En caso de no poder abrirse el archivo excel, o este no ser valido,
@@ -54,7 +56,6 @@ func newSelectorMats() *selectMats {
 func (m *selectMats) Update(msg tea.Msg) (tea.Cmd) {
 	var cmd tea.Cmd
 	m.list, cmd = m.list.Update(msg)
-	m.Filtering = m.list.FilterState().String() == "filtering"
 	if !m.Filtering {
 		m.Focused = m.indexOf()
 	}
@@ -76,7 +77,8 @@ func (m *selectMats) Update(msg tea.Msg) (tea.Cmd) {
 		return cmd
 	}
 
-	return nil
+	m.Filtering = m.list.FilterState().String() == "filtering"
+	return cmd
 }
 
 func (m *selectMats) View() string {

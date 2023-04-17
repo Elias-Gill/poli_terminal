@@ -50,7 +50,8 @@ func (a ArmadorHorario) Update(msg tea.Msg) (ArmadorHorario, tea.Cmd) {
 	case tea.KeyMsg:
 		// salir
 		if msg.String() == "q" || msg.String() == tea.KeyEsc.String() {
-            if !a.selector.Filtering || a.mode == inLista { // TODO:delegar al selector
+			// TODO:delegar al selector
+			if !a.selector.Filtering || a.mode == inLista {
 				a.mode = inPrompt
 				a.prompt = pts.NewPrompt("Desea GUARDAR este nuevo horario ?")
 				return a, nil
@@ -58,6 +59,7 @@ func (a ArmadorHorario) Update(msg tea.Msg) (ArmadorHorario, tea.Cmd) {
 		}
 
 		// mensaje de confirmacion
+		// TODO: refactor
 		if a.mode == inPrompt {
 			if msg.String() == "enter" {
 				if a.prompt.Selection == "Yes" {
@@ -95,7 +97,7 @@ func (a ArmadorHorario) Update(msg tea.Msg) (ArmadorHorario, tea.Cmd) {
 	if a.mode == inSelector {
 		// anadir materia
 		cmd = a.selector.Update(msg)
-        a.infoMat.ChangeMateria(a.selector.Focused)
+		a.infoMat.ChangeMateria(a.selector.Focused)
 		if !a.selector.Filtering {
 			if a.selector.IsSelected {
 				a.listaSelecs.AddMateria(a.selector.Focused)
