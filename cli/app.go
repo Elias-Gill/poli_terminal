@@ -107,7 +107,7 @@ func (a App) selectMode() (tea.Model, tea.Cmd) {
 	switch a.mainMenu.List.SelectedItem().FilterValue() {
 	case "modHorario": // abrir la lista de materias entera
 		a.Mode = inArmarHor
-		a.selectorMats = armHors.NewArmador(a.config.ExcelFile)
+		a.selectorMats = armHors.NewArmador()
 		// truco para mandar informacion de tamano
 		a.selectorMats, _ = a.selectorMats.Update(
 			tea.WindowSizeMsg{

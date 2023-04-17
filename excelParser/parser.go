@@ -68,7 +68,7 @@ func openExcelFile(fname string) (*excelize.File, error) {
 
 // Retorna la lista de materias de la carrera con fechas de finales, semestre,
 // parciales, profesor y seccion
-func Parse(fname string, sheet int) ([]Materia, error) {
+func Parse(fname string, sheet int) ([]*Materia, error) {
 	excelFile, err := openExcelFile(fname)
 	if err != nil {
 		return nil, err
@@ -84,7 +84,7 @@ func Parse(fname string, sheet int) ([]Materia, error) {
 
 	// determinar donde empieza la lista de materias
 	validRows := getValidRows(cols)
-	asignaturas := []Materia{}
+	asignaturas := []*Materia{}
 
 	// Comenzar a cargar la lista de asignaturas
 	cont := 0
@@ -100,7 +100,7 @@ func Parse(fname string, sheet int) ([]Materia, error) {
 			Sabado:    string(cols[38][row]),
 		}
 		// armar la materia
-		asignaturas = append(asignaturas, Materia{
+		asignaturas = append(asignaturas, &Materia{
 			Nombre:   "#" + strconv.Itoa(cont) + "  " + string(cols[2][row]),
 			Semestre: s,
 			Seccion:  string(cols[9][row]),

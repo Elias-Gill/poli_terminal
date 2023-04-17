@@ -14,15 +14,15 @@ var baseStyle = lipgloss.NewStyle().
 type listSelecs struct {
 	color  int
 	table  table.Model
-	lista  []ep.Materia
+	lista  []*ep.Materia
 	height int
 	width  int
 	Quit   bool
 }
 
-func (m listSelecs) Init() tea.Cmd { return nil }
+func (m *listSelecs) Init() tea.Cmd { return nil }
 
-func (m listSelecs) Update(msg tea.Msg) (listSelecs, tea.Cmd) {
+func (m *listSelecs) Update(msg tea.Msg) tea.Cmd {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -33,20 +33,20 @@ func (m listSelecs) Update(msg tea.Msg) (listSelecs, tea.Cmd) {
 				m.lista, i = m.DelMateria()
 				m.table.SetRows(m.nuevasFilas())
 				m.table.SetCursor(i)
-				return m, cmd
+				return cmd
 			}
 		}
 	case tea.WindowSizeMsg:
 		x, y := baseStyle.GetFrameSize()
 		m.table.SetWidth(msg.Width - x)
 		m.table.SetHeight(msg.Height - y)
-		return m, cmd
+		return cmd
 	}
 	m.table, cmd = m.table.Update(msg)
-	return m, cmd
+	return cmd
 }
 
-func (m listSelecs) View() string {
+func (m *listSelecs) View() string {
 	var style = lipgloss.NewStyle().
 		BorderStyle(lipgloss.NormalBorder())
 	if m.color == 1 {
@@ -58,14 +58,15 @@ func (m listSelecs) View() string {
 }
 
 // retorna una nueva lista de materias
-func newLista(m []ep.Materia) listSelecs {
-	return listSelecs{
+func newListaSelecciones(m []*ep.Materia) *listSelecs {
+	return &listSelecs{
 		table: construirTabla(m),
+		lista: m,
 		Quit:  false,
 	}
 }
 
-func construirTabla(m []ep.Materia) table.Model {
+func construirTabla(m []*ep.Materia) table.Model {
 	columns := []table.Column{
 		{Title: "Asignatura", Width: 30},
 		{Title: "Seccion", Width: 7},
@@ -101,25 +102,24 @@ func construirTabla(m []ep.Materia) table.Model {
 }
 
 // Anade la nueva materia proporcionada a la lista
-func (l listSelecs) AddMateria(mat ep.Materia) listSelecs {
+func (l *listSelecs) AddMateria(mat *ep.Materia) {
 	// buscar que no se repita
 	for _, v := range l.lista {
 		if v.Nombre == mat.Nombre {
-			return l
+            return
 		}
 	}
 	l.lista = append(l.lista, mat)
 	l.table.SetRows(l.nuevasFilas())
-	return l
 }
 
 // Elimina de la lista la materias actualmente enfocada.
 //
 // Retorna una nueva lista y el indice donde se debe colocar de nuevo el foco
 // de la lista
-func (l listSelecs) DelMateria() ([]ep.Materia, int) {
+func (l *listSelecs) DelMateria() ([]*ep.Materia, int) {
 	selec := l.table.SelectedRow()[0]
-	var aux []ep.Materia
+	var aux []*ep.Materia
 	index := 1
 	for i, m := range l.lista {
 		if m.Nombre != selec {
@@ -131,7 +131,7 @@ func (l listSelecs) DelMateria() ([]ep.Materia, int) {
 	return aux, index - 1
 }
 
-func (l listSelecs) nuevasFilas() []table.Row {
+func (l *listSelecs) nuevasFilas() []table.Row {
 	rows := []table.Row{}
 	for _, v := range l.lista {
 		rows = append(rows, table.Row{

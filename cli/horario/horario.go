@@ -50,7 +50,7 @@ func NewHorario() DisplayHorario {
 	}
 }
 
-func nuevaTablaDias(m []ep.Materia) table.Model {
+func nuevaTablaDias(m []*ep.Materia) table.Model {
 	columns := []table.Column{
 		{Title: "", Width: 18},
 		{Title: "Lunes", Width: 18},
@@ -96,7 +96,7 @@ func nuevaTablaDias(m []ep.Materia) table.Model {
 	return t
 }
 
-func nuevaTablaMats(m []ep.Materia) table.Model {
+func nuevaTablaMats(m []*ep.Materia) table.Model {
 	columns := []table.Column{
 		{Title: "Asignatura", Width: 18},
 		{Title: "Profesor", Width: 18},

@@ -12,8 +12,8 @@ import (
 // archivo de configuracion
 type Configurations struct {
 	ExcelFile       string       `json:"file_horario"`
-	MateriasUsuario []ep.Materia `json:"lista_materias"`
-	MateriasExcel   []ep.Materia `json:"lista_excel"`
+	MateriasUsuario []*ep.Materia `json:"lista_materias"`
+	MateriasExcel   []*ep.Materia `json:"lista_excel"`
 	Sheet           int          `json:"sheet_number"`
 }
 
@@ -31,7 +31,7 @@ func GetUserConfig() *Configurations {
 }
 
 // Cambia las materias de la configuracion del usuario
-func (c *Configurations) ChangeMateriasUsuario(m []ep.Materia) {
+func (c *Configurations) ChangeMateriasUsuario(m []*ep.Materia) {
 	c.MateriasUsuario = m
 }
 
@@ -48,7 +48,7 @@ func (c *Configurations) ChangeExcelFile(f string) error {
 
 // Parsear la configuracion del usuario y la guarda en memoria.
 // Pensada para ser llamada una sola vez durante el inicio de la app, dentro de una
-// GoRoutine
+// GoRoutine TODO: asincronia
 func LoadUserConfig() *Configurations {
 	// asegurarse que el archivo exista
 	ensureConfigExistence()

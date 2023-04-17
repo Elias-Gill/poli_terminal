@@ -9,27 +9,30 @@ import (
 
 type infoMateria struct {
 	Quit    bool
-	materia ep.Materia
+	materia *ep.Materia
 	width   int
 	height  int
 }
 
-func newInfoMateria(m ep.Materia) infoMateria {
-	return infoMateria{materia: m, Quit: false}
+func newInfoMateria(m *ep.Materia) *infoMateria {
+	return &infoMateria{materia: m, Quit: false}
 }
 
-func (i infoMateria) Init() tea.Cmd { return nil }
+func (i *infoMateria) Init() tea.Cmd { return nil }
 
-func (i infoMateria) Update(msg tea.Msg) (infoMateria, tea.Cmd) {
+func (i *infoMateria) Update(msg tea.Msg) (tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		i.width = msg.Width
 		i.height = msg.Height
 	}
-	return i, nil
+	return nil
 }
 
-func (i infoMateria) View() string {
+func (i *infoMateria) View() string {
+	if i.materia == nil {
+		return "\n\n\n\n\n\n\n"
+	}
 	res := styles.DoneStyle.Render(i.materia.Profesor) +
 		"\n" + styles.GoodStyle.Render("Parciales: \t") +
 		"\n" + i.materia.Parcial1 +
@@ -41,7 +44,6 @@ func (i infoMateria) View() string {
 	return lipgloss.PlaceHorizontal(i.width, lipgloss.Left, res)
 }
 
-func (i infoMateria) ChangeMateria(m ep.Materia) infoMateria {
+func (i *infoMateria) ChangeMateria(m *ep.Materia) {
 	i.materia = m
-	return i
 }
