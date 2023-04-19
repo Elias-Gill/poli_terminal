@@ -11,7 +11,6 @@ import (
 // Configuracion general del usuario. Estos datos son almacenados en el
 // archivo de configuracion
 type Configurations struct {
-	ExcelFile       string        `json:"file_horario"`
 	ExcelFile       string        `json:"excel_file"`
 	MateriasUsuario []*ep.Materia `json:"lista_materias"`
 	MateriasExcel   []*ep.Materia `json:"lista_excel"`
