@@ -12,6 +12,7 @@ import (
 // archivo de configuracion
 type Configurations struct {
 	ExcelFile       string        `json:"file_horario"`
+	ExcelFile       string        `json:"excel_file"`
 	MateriasUsuario []*ep.Materia `json:"lista_materias"`
 	MateriasExcel   []*ep.Materia `json:"lista_excel"`
 	Sheet           int           `json:"sheet_number"`
@@ -57,7 +58,7 @@ func LoadUserConfig() *Configurations {
 	// parsear
 	var config Configurations
 	json.NewDecoder(file).Decode(&config)
-    // si el excel no esta "chacheado"
+	// revisar si el excel ya no esta "pre parseado"
 	if config.MateriasExcel == nil {
 		// cargar las materias del excel TODO: cambio de carrera (sheet)
 		config.MateriasExcel, _ = ep.Parse(config.ExcelFile, config.Sheet)
@@ -81,15 +82,15 @@ func (c Configurations) WriteUserConfig() {
 // los crea de ser necesario. Panic cuando no se puede crear el archivo de configuracion
 func ensureConfigExistence() {
 	// Crear la carpeta
-	if _, err := os.Stat(configPaths.path); os.IsExist(err) {
-		err := os.Mkdir(configPaths.path, os.ModeDir)
+	if _, err := os.Stat(configPaths.path); os.IsNotExist(err) {
+		err := os.Mkdir(configPaths.path, 0777)
 		if err != nil {
 			panic("No se pudo crear la carpeta para la configuracion. \nAsegurate de tener los permisos adecuados")
 		}
 	}
 
 	// Crear el archivo
-	if _, err := os.Stat(configPaths.file); os.IsExist(err) {
+	if _, err := os.Stat(configPaths.file); os.IsNotExist(err) {
 		_, err = os.Create(configPaths.file)
 		if err != nil {
 			panic("No se pudo crear el archivo de configuracion del horario. \nAsegurate de tener los permisos adecuados")

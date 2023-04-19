@@ -17,18 +17,18 @@ type Dias struct {
 }
 
 type Materia struct {
-    // general
+	// general
 	Nombre   string `json:"nombre"`
 	Semestre int    `json:"semestre"`
 	Seccion  string `json:"seccion"`
 	Profesor string `json:"profesor"`
-    // examenes
+	// examenes
 	Parcial1 string `json:"parcial_1"`
 	Parcial2 string `json:"parcial_2"`
 	Final1   string `json:"final_1"`
 	Final2   string `json:"final_2"`
-    // horario de clase
-	Dias     Dias
+	// horario de clase
+	Dias Dias
 }
 
 type rowLimit struct {

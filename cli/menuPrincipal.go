@@ -11,6 +11,8 @@ func NewMainMenu() MenuPrincipal {
 		menuItem{Action: "horario", Tit: "Mi horario", Desc: "Revisa tu horario semanal y las fechas de examenes"},
 		menuItem{Action: "calendario", Tit: "Calendario", Desc: "Mira en un calendario tus fechas de examenes"},
 		menuItem{Action: "modHorario", Tit: "Modificar horario", Desc: "Realiza cambios al horario o crea uno desde 0"},
+		menuItem{Action: "modHorario", Tit: "Modificar horario", Desc: "Realiza cambios en el horario (primero debes configurar el excel en 'Configuraciones')"},
+		menuItem{Action: "configuracion", Tit: "Configuracion", Desc: "Cambia las configuraciones del sistema"},
 		menuItem{Action: "salir", Tit: "Salir", Desc: "Mas vale que sea para fiestear, ehemm, estudiar..."},
 	}
 
