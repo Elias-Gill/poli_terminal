@@ -39,7 +39,7 @@ func (c *Configurations) ChangeMateriasUsuario(m []*ep.Materia) {
 func (c *Configurations) ChangeExcelFile(f string) error {
 	aux, err := ep.Parse(f, c.Sheet)
 	if err != nil {
-		return err
+		panic("no se puede abrir el execl")
 	}
 	c.ExcelFile = f
 	c.MateriasExcel = aux
@@ -58,9 +58,10 @@ func LoadUserConfig() *Configurations {
 	var config Configurations
 	json.NewDecoder(file).Decode(&config)
 	// revisar si el excel ya no esta "pre parseado"
-	if config.MateriasExcel == nil {
+	if len(config.MateriasExcel) == 0 {
 		// cargar las materias del excel TODO: cambio de carrera (sheet)
 		config.MateriasExcel, _ = ep.Parse(config.ExcelFile, config.Sheet)
+		config.WriteUserConfig()
 	}
 	return &config
 }

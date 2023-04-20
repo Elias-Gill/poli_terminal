@@ -11,8 +11,6 @@ mayor responsibidad, velocidad, y un diseño mas amigable con el usuario.
 
 ## TODOS
 
-* [ ] Descarga automatica de horarios (esta vez si)
 * [ ] Calculadora de notas
-* [ ] Posibilidad de administrar varios horarios al mismo tiempo
+* [ ] Descarga automatica de horarios
 * [ ] Conectividad con servicios de google
-* [ ] Conectividad con calendario de EDUCA

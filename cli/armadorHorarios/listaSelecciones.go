@@ -4,6 +4,7 @@ import (
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/elias-gill/poli_terminal/configManager"
 	ep "github.com/elias-gill/poli_terminal/excelParser"
 )
 
@@ -12,12 +13,12 @@ var baseStyle = lipgloss.NewStyle().
 	BorderForeground(lipgloss.Color("240"))
 
 type listSelecs struct {
-	color  int
-	table  table.Model
-	lista  []*ep.Materia
-	height int
-	width  int
-	Quit   bool
+	table     table.Model
+	lista     []*ep.Materia
+	height    int
+	width     int
+	isFocused bool
+	Quit      bool
 }
 
 func (m *listSelecs) Init() tea.Cmd { return nil }
@@ -49,7 +50,7 @@ func (m *listSelecs) Update(msg tea.Msg) tea.Cmd {
 func (m *listSelecs) View() string {
 	var style = lipgloss.NewStyle().
 		BorderStyle(lipgloss.NormalBorder())
-	if m.color == 1 {
+	if m.isFocused {
 		style.BorderForeground(lipgloss.Color("43"))
 	} else {
 		style.BorderForeground(lipgloss.Color("23"))
@@ -58,10 +59,12 @@ func (m *listSelecs) View() string {
 }
 
 // retorna una nueva lista de materias
-func newListaSelecciones(m []*ep.Materia) *listSelecs {
+func newListaSelecciones() *listSelecs {
+	m := configManager.GetUserConfig().MateriasUsuario
 	return &listSelecs{
 		table: construirTabla(m),
 		lista: m,
+        isFocused: false,
 		Quit:  false,
 	}
 }
@@ -106,7 +109,7 @@ func (l *listSelecs) AddMateria(mat *ep.Materia) {
 	// buscar que no se repita
 	for _, v := range l.lista {
 		if v.Nombre == mat.Nombre {
-            return
+			return
 		}
 	}
 	l.lista = append(l.lista, mat)

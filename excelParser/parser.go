@@ -1,7 +1,6 @@
 package excelParser
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/xuri/excelize/v2"
@@ -71,14 +70,14 @@ func openExcelFile(fname string) (*excelize.File, error) {
 func Parse(fname string, sheet int) ([]*Materia, error) {
 	excelFile, err := openExcelFile(fname)
 	if err != nil {
-		return nil, err
+		panic("No se puede abrir el excel")
 	}
 	defer excelFile.Close()
 
 	// parsear las columnas
 	cols, err := excelFile.GetCols(excelFile.GetSheetName(sheet))
 	if err != nil {
-		return nil, fmt.Errorf("No se pudo abrir el excel: \n" + err.Error())
+		panic("No se puede Parsear el excel")
 	}
 	defer excelFile.Close()
 
