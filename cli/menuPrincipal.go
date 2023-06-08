@@ -6,6 +6,7 @@ import (
 	"github.com/elias-gill/poli_terminal/styles"
 )
 
+// generates a new instance of the main menu
 func NewMainMenu() MenuPrincipal {
 	items := []list.Item{
 		menuItem{Action: "horario", Tit: "Mi horario", Desc: "Revisa tu horario semanal y las fechas de examenes"},

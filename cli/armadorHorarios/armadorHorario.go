@@ -31,12 +31,17 @@ type ArmadorHorario struct {
 }
 
 func NewArmador() ArmadorHorario {
-	selector := newSelectorMats()
+	selector, err := newSelectorMats()
+    if err != nil {
+        panic("No se pudo inicializar el armador de horarios")
+    }
+    inf := newInfoMateria(selector.Focused)
+    lista := newListaSelecciones()
 	return ArmadorHorario{
 		mode:        inSelector,
 		Quit:        false,
-		infoMat:     newInfoMateria(selector.Focused),
-		listaSelecs: newListaSelecciones(),
+		infoMat:     inf,
+		listaSelecs: lista,
 		selector:    selector,
 	}
 }

@@ -2,6 +2,7 @@ package configManager
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"runtime"
 
@@ -17,8 +18,8 @@ type Configurations struct {
 	Sheet           int           `json:"sheet_number"`
 }
 
-var usersConfig = LoadUserConfig()
 var configPaths = searchConfigFiles()
+var usersConfig = LoadUserConfig()
 
 type paths struct {
 	path string
@@ -46,9 +47,8 @@ func (c *Configurations) ChangeExcelFile(f string) error {
 	return nil
 }
 
-// Parsear la configuracion del usuario y la guarda en memoria.
-// Pensada para ser llamada una sola vez durante el inicio de la app, dentro de una
-// GoRoutine TODO: asincronia
+// Parsear la configuracion del usuario y la guarda en memoria. Solo se llama una vez al inicio
+// del programa
 func LoadUserConfig() *Configurations {
 	// asegurarse que el archivo exista
 	ensureConfigExistence()
@@ -57,11 +57,20 @@ func LoadUserConfig() *Configurations {
 	// parsear
 	var config Configurations
 	json.NewDecoder(file).Decode(&config)
+
+	// seleccionar una hoja por defecto (IIN)
+	if config.Sheet == 0 {
+		config.Sheet = 6
+	}
+
 	// revisar si el excel ya no esta "pre parseado"
 	if len(config.MateriasExcel) == 0 {
-		// cargar las materias del excel TODO: cambio de carrera (sheet)
-		config.MateriasExcel, _ = ep.Parse(config.ExcelFile, config.Sheet)
-		config.WriteUserConfig()
+		// cargar las materias del excel
+		aux, err := ep.Parse(config.ExcelFile, config.Sheet)
+		if err == nil {
+			config.MateriasExcel = aux
+			config.WriteUserConfig()
+		}
 	}
 	return &config
 }
@@ -70,11 +79,13 @@ func LoadUserConfig() *Configurations {
 func (c Configurations) WriteUserConfig() {
 	data, err := json.MarshalIndent(c, "", " ")
 	if err != nil {
-		panic("No se pudo generar la configuracion. Lo sentimos, algo salio mal")
+		fmt.Print("No se pudo generar la configuracion. Lo sentimos, algo salio mal")
+		os.Exit(1)
 	}
 	err = os.WriteFile(configPaths.file, data, 0644)
 	if err != nil {
-		panic("No se pudo escribir en el archivo de configuracion.\nAsegurese de tener los permisos necesarios")
+		fmt.Print("No se pudo escribir en el archivo de configuracion.\nAsegurese de tener los permisos necesarios")
+		os.Exit(1)
 	}
 }
 
@@ -85,7 +96,8 @@ func ensureConfigExistence() {
 	if _, err := os.Stat(configPaths.path); os.IsNotExist(err) {
 		err := os.Mkdir(configPaths.path, 0777)
 		if err != nil {
-			panic("No se pudo crear la carpeta para la configuracion. \nAsegurate de tener los permisos adecuados")
+			fmt.Print("No se pudo crear la carpeta para la configuracion. \nAsegurate de tener los permisos adecuados")
+			os.Exit(1)
 		}
 	}
 
@@ -93,17 +105,19 @@ func ensureConfigExistence() {
 	if _, err := os.Stat(configPaths.file); os.IsNotExist(err) {
 		_, err = os.Create(configPaths.file)
 		if err != nil {
-			panic("No se pudo crear el archivo de configuracion del horario. \nAsegurate de tener los permisos adecuados")
+			fmt.Print("No se pudo crear el archivo de configuracion. \nAsegurate de tener los permisos adecuados")
+			os.Exit(1)
 		}
 	}
 }
 
-// Determinar la ubicacion del archivo de configuracion en runtime dependiendo del OS.
+// Determina la ubicacion del archivo de configuracion.
 func searchConfigFiles() paths {
 	osys := runtime.GOOS
 	userPaht, err := os.UserHomeDir()
 	if err != nil {
-		panic("Cannot determine your home directory, somehting goes wrong")
+		fmt.Print("Cannot determine your home directory, somehting goes wrong")
+		os.Exit(1)
 	}
 
 	if osys == "windows" {

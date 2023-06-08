@@ -1,6 +1,8 @@
 package armadorHorarios
 
 import (
+	"fmt"
+
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -31,8 +33,11 @@ type selectMats struct {
 
 // Retorna una nueva lista de materias. En caso de no poder abrirse el archivo excel, o este no ser valido,
 // se retorna un error
-func newSelectorMats() *selectMats {
+func newSelectorMats() (*selectMats, error) {
 	materias := cfm.GetUserConfig().MateriasExcel
+    if materias == nil {
+        return nil, fmt.Errorf("Error al parsear requerir la config del usuario")
+    }
 	// Cargar las materias disponibles
 	items := []list.Item{}
 	for _, mat := range materias {
@@ -51,7 +56,7 @@ func newSelectorMats() *selectMats {
 		IsSelected: false,
 	}
 	m.list.Title = "Lista de asignaturas"
-	return &m
+	return &m, nil
 }
 
 func (m *selectMats) Update(msg tea.Msg) tea.Cmd {

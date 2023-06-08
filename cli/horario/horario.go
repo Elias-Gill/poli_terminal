@@ -77,7 +77,7 @@ func nuevaTablaDias(m []*ep.Materia) table.Model {
 	t := table.New(
 		table.WithColumns(columns),
 		table.WithRows(rows),
-		table.WithFocused(true),
+		table.WithFocused(false),
 		table.WithHeight(8),
 	)
 
@@ -87,12 +87,9 @@ func nuevaTablaDias(m []*ep.Materia) table.Model {
 		BorderForeground(lipgloss.Color("240")).
 		BorderBottom(true).
 		Bold(false)
-	s.Selected = s.Selected.
-		Foreground(lipgloss.Color("229")).
-		Background(lipgloss.Color("57")).
-		Bold(false)
-	t.SetStyles(s)
+	s.Selected = s.Selected.Bold(false)
 
+	t.SetStyles(s)
 	return t
 }
 
@@ -123,7 +120,7 @@ func nuevaTablaMats(m []*ep.Materia) table.Model {
 	t := table.New(
 		table.WithColumns(columns),
 		table.WithRows(rows),
-		table.WithFocused(true),
+		table.WithFocused(false),
 		table.WithHeight(8),
 	)
 
@@ -133,11 +130,7 @@ func nuevaTablaMats(m []*ep.Materia) table.Model {
 		BorderForeground(lipgloss.Color("240")).
 		BorderBottom(true).
 		Bold(false)
-	s.Selected = s.Selected.
-		Foreground(lipgloss.Color("229")).
-		Background(lipgloss.Color("57")).
-		Bold(false)
-	t.SetStyles(s)
+	s.Selected = s.Selected.Bold(false)
 
 	return t
 }
