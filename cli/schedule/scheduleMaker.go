@@ -1,4 +1,4 @@
-package armadorHorarios
+package schedule
 
 import (
 	tea "github.com/charmbracelet/bubbletea"
@@ -24,10 +24,10 @@ type ScheduleMaker struct {
 	height          int
 	Quit            bool
 	mode            int
-	prompt          *pts.Prompt
-	infoMat         *infoMateria
-	selectedList    *listSelecs
-	subjectSelector *selectorMats
+	prompt          *pts.ConfirmPrompt
+	infoMat         *subjectInfo
+	selectedList    *selectedList
+	subjectSelector *selector
 }
 
 func NewScheduleMaker() ScheduleMaker {
@@ -55,7 +55,7 @@ func (a ScheduleMaker) Update(msg tea.Msg) (ScheduleMaker, tea.Cmd) {
 		if msg.String() == "q" || msg.String() == tea.KeyEsc.String() {
 			if a.mode != inSelector || !a.subjectSelector.Filtering {
 				a.mode = inPrompt
-				a.prompt = pts.NewPrompt("Desea GUARDAR este nuevo horario ?")
+				a.prompt = pts.NewConfirmPrompt("Desea GUARDAR este nuevo horario ?")
 				return a, nil
 			}
 		}

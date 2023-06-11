@@ -1,4 +1,4 @@
-package cli
+package menus
 
 import (
 	"github.com/charmbracelet/bubbles/list"
@@ -7,7 +7,7 @@ import (
 )
 
 // generates a new instance of the main menu
-func NewMainMenu() MenuPrincipal {
+func NewMainMenu() MainMenu {
 	items := []list.Item{
 		menuItem{Action: "horario", Tit: "Mi horario", Desc: "Revisa tu horario semanal y las fechas de examenes"},
 		menuItem{Action: "calendario", Tit: "Calendario", Desc: "Mira en un calendario tus fechas de examenes"},
@@ -16,7 +16,7 @@ func NewMainMenu() MenuPrincipal {
 		menuItem{Action: "salir", Tit: "Salir", Desc: "Mas vale que sea para fiestear, ehemm, estudiar..."},
 	}
 
-	m := MenuPrincipal{List: list.New(items, list.NewDefaultDelegate(), 0, 0)}
+	m := MainMenu{List: list.New(items, list.NewDefaultDelegate(), 0, 0)}
 	m.List.Title = "Mi Politerminal"
 	m.List.SetFilteringEnabled(false)
 	return m
@@ -30,17 +30,17 @@ func (i menuItem) Title() string       { return i.Tit }
 func (i menuItem) Description() string { return i.Desc }
 func (i menuItem) FilterValue() string { return i.Action }
 
-type MenuPrincipal struct {
+type MainMenu struct {
 	List       list.Model
 	IsSelected bool
 }
 
-func (m MenuPrincipal) Init() tea.Cmd {
+func (m MainMenu) Init() tea.Cmd {
 	return nil
 }
 
 // actualizar el modelo
-func (m MenuPrincipal) Update(msg tea.Msg) (MenuPrincipal, tea.Cmd) {
+func (m MainMenu) Update(msg tea.Msg) (MainMenu, tea.Cmd) {
 	// handle special events
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -63,6 +63,6 @@ func (m MenuPrincipal) Update(msg tea.Msg) (MenuPrincipal, tea.Cmd) {
 }
 
 // mostrar menu de seleccion
-func (m MenuPrincipal) View() string {
+func (m MainMenu) View() string {
 	return m.List.View()
 }

@@ -5,23 +5,23 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-type Prompt struct {
+type ConfirmPrompt struct {
 	Selection  bool
 	Quit      bool
 	Msg       string
 }
 
-func NewPrompt(msg string) *Prompt {
-	return &Prompt{
+func NewConfirmPrompt(msg string) *ConfirmPrompt {
+	return &ConfirmPrompt{
 		Msg:       msg,
 		Selection:  false,
 		Quit:      false,
 	}
 }
 
-func (p *Prompt) Init() tea.Cmd { return nil }
+func (p *ConfirmPrompt) Init() tea.Cmd { return nil }
 
-func (p *Prompt) Update(msg tea.Msg) *Prompt {
+func (p *ConfirmPrompt) Update(msg tea.Msg) *ConfirmPrompt {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		if msg.String() == "enter" {
@@ -42,7 +42,7 @@ func (p *Prompt) Update(msg tea.Msg) *Prompt {
 }
 
 // TODO: refactor
-func (p *Prompt) View() string {
+func (p *ConfirmPrompt) View() string {
 	style := lipgloss.NewStyle().
 		Align(lipgloss.Center).
 		Border(lipgloss.RoundedBorder(), true)

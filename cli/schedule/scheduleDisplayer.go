@@ -1,4 +1,4 @@
-package horario
+package schedule
 
 import (
 	"github.com/charmbracelet/bubbles/table"
@@ -8,15 +8,15 @@ import (
 	ep "github.com/elias-gill/poli_terminal/excelParser"
 )
 
-type DisplayHorario struct {
+type ScheduleDisplayer struct {
 	tablaMats table.Model
 	tablaDias table.Model
 	Quit      bool
 }
 
-func (m DisplayHorario) Init() tea.Cmd { return nil }
+func (m ScheduleDisplayer) Init() tea.Cmd { return nil }
 
-func (m DisplayHorario) Update(msg tea.Msg) (DisplayHorario, tea.Cmd) {
+func (m ScheduleDisplayer) Update(msg tea.Msg) (ScheduleDisplayer, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -32,7 +32,7 @@ func (m DisplayHorario) Update(msg tea.Msg) (DisplayHorario, tea.Cmd) {
 	return m, cmd
 }
 
-func (m DisplayHorario) View() string {
+func (m ScheduleDisplayer) View() string {
 	var baseStyle = lipgloss.NewStyle().
 		BorderStyle(lipgloss.NormalBorder()).
 		BorderForeground(lipgloss.Color("23"))
@@ -41,9 +41,9 @@ func (m DisplayHorario) View() string {
 		baseStyle.Render(m.tablaMats.View())
 }
 
-func NewHorario() DisplayHorario {
+func NewScheduleDisplayer() ScheduleDisplayer {
 	m := configManager.GetUserConfig().MateriasUsuario
-	return DisplayHorario{
+	return ScheduleDisplayer{
 		tablaMats: nuevaTablaMats(m),
 		tablaDias: nuevaTablaDias(m),
 		Quit:      false,

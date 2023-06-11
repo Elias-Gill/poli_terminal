@@ -1,4 +1,4 @@
-package cli
+package menus
 
 import (
 	"github.com/charmbracelet/bubbles/list"
@@ -6,7 +6,7 @@ import (
 	"github.com/elias-gill/poli_terminal/styles"
 )
 
-func NewMenuConfigs() MenuPrincipal {
+func NewMenuConfigs() MainMenu {
 	items := []list.Item{
 		menuItem{Action: "horario", Tit: "Mi horario", Desc: "Revisa tu horario semanal y las fechas de examenes"},
 		menuItem{Action: "calendario", Tit: "Calendario", Desc: "Mira en un calendario tus fechas de examenes"},
@@ -14,7 +14,7 @@ func NewMenuConfigs() MenuPrincipal {
 		menuItem{Action: "salir", Tit: "Salir", Desc: "Mas vale que sea para fiestear, ehemm, estudiar..."},
 	}
 
-	m := MenuPrincipal{List: list.New(items, list.NewDefaultDelegate(), 0, 0)}
+	m := MainMenu{List: list.New(items, list.NewDefaultDelegate(), 0, 0)}
 	m.List.Title = "Mi Politerminal"
 	m.List.SetFilteringEnabled(false)
 	return m

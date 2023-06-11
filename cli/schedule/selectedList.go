@@ -1,4 +1,4 @@
-package armadorHorarios
+package schedule
 
 import (
 	"github.com/charmbracelet/bubbles/table"
@@ -12,7 +12,7 @@ var baseStyle = lipgloss.NewStyle().
 	BorderStyle(lipgloss.NormalBorder()).
 	BorderForeground(lipgloss.Color("240"))
 
-type listSelecs struct {
+type selectedList struct {
 	table     table.Model
 	lista     []*ep.Materia
 	height    int
@@ -21,9 +21,9 @@ type listSelecs struct {
 	Quit      bool
 }
 
-func (m *listSelecs) Init() tea.Cmd { return nil }
+func (m *selectedList) Init() tea.Cmd { return nil }
 
-func (m *listSelecs) Update(msg tea.Msg) tea.Cmd {
+func (m *selectedList) Update(msg tea.Msg) tea.Cmd {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -47,7 +47,7 @@ func (m *listSelecs) Update(msg tea.Msg) tea.Cmd {
 	return cmd
 }
 
-func (m *listSelecs) View() string {
+func (m *selectedList) View() string {
 	var style = lipgloss.NewStyle().
 		BorderStyle(lipgloss.NormalBorder())
 	if m.isFocused {
@@ -59,13 +59,13 @@ func (m *listSelecs) View() string {
 }
 
 // retorna una nueva lista de materias
-func newListaSelecciones() *listSelecs {
+func newListaSelecciones() *selectedList {
 	m := configManager.GetUserConfig().MateriasUsuario
-	return &listSelecs{
-		table: construirTabla(m),
-		lista: m,
-        isFocused: false,
-		Quit:  false,
+	return &selectedList{
+		table:     construirTabla(m),
+		lista:     m,
+		isFocused: false,
+		Quit:      false,
 	}
 }
 
@@ -105,7 +105,7 @@ func construirTabla(m []*ep.Materia) table.Model {
 }
 
 // Anade la nueva materia proporcionada a la lista
-func (l *listSelecs) AddMateria(mat *ep.Materia) {
+func (l *selectedList) AddMateria(mat *ep.Materia) {
 	// buscar que no se repita
 	for _, v := range l.lista {
 		if v.Nombre == mat.Nombre {
@@ -120,7 +120,7 @@ func (l *listSelecs) AddMateria(mat *ep.Materia) {
 //
 // Retorna una nueva lista y el indice donde se debe colocar de nuevo el foco
 // de la lista
-func (l *listSelecs) DelMateria() ([]*ep.Materia, int) {
+func (l *selectedList) DelMateria() ([]*ep.Materia, int) {
 	selec := l.table.SelectedRow()[0]
 	var aux []*ep.Materia
 	index := 1
@@ -134,7 +134,7 @@ func (l *listSelecs) DelMateria() ([]*ep.Materia, int) {
 	return aux, index - 1
 }
 
-func (l *listSelecs) nuevasFilas() []table.Row {
+func (l *selectedList) nuevasFilas() []table.Row {
 	rows := []table.Row{}
 	for _, v := range l.lista {
 		rows = append(rows, table.Row{

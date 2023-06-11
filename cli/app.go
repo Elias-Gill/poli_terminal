@@ -2,8 +2,8 @@ package cli
 
 import (
 	tea "github.com/charmbracelet/bubbletea"
-	armHors "github.com/elias-gill/poli_terminal/cli/armadorHorarios"
-	"github.com/elias-gill/poli_terminal/cli/horario"
+	"github.com/elias-gill/poli_terminal/cli/menus"
+	"github.com/elias-gill/poli_terminal/cli/schedule"
 	cfman "github.com/elias-gill/poli_terminal/configManager"
 	"github.com/elias-gill/poli_terminal/styles"
 )
@@ -23,14 +23,14 @@ type App struct {
 	config    *cfman.Configurations
 
 	// components
-	mainMenu MenuPrincipal
-	horario  horario.DisplayHorario
-	maker    armHors.ScheduleMaker
+	mainMenu menus.MainMenu
+	horario  schedule.ScheduleDisplayer
+	maker    schedule.ScheduleMaker
 }
 
 func NewApp() App {
 	return App{
-		mainMenu: NewMainMenu(),
+		mainMenu: menus.NewMainMenu(),
 		config:   cfman.GetUserConfig(),
 		Mode:     inMenu,
 	}
@@ -107,7 +107,7 @@ func (a App) selectMode() (tea.Model, tea.Cmd) {
 	switch a.mainMenu.List.SelectedItem().FilterValue() {
 	case "scheduleMaker":
 		a.Mode = inScheduleMaker
-		a.maker = armHors.NewScheduleMaker()
+		a.maker = schedule.NewScheduleMaker()
 		// truco para mandar informacion de tamano
 		a.maker, _ = a.maker.Update(
 			tea.WindowSizeMsg{
@@ -116,11 +116,10 @@ func (a App) selectMode() (tea.Model, tea.Cmd) {
 			},
 		)
 
-	case "horario": // abrir mi horario actual
+	case "horario": // abrir mi horario actual TODO: continuar
 		a.Mode = inHorario
-		// TODO: continuar
 		var err error
-		a.horario = horario.NewHorario()
+		a.horario = schedule.NewScheduleDisplayer()
 		if err != nil {
 			panic(err)
 		}
