@@ -44,6 +44,6 @@ func (i *infoMateria) View() string {
 	return lipgloss.PlaceHorizontal(i.width, lipgloss.Left, res)
 }
 
-func (i *infoMateria) ChangeMateria(m *ep.Materia) {
+func (i *infoMateria) CambiarMateria(m *ep.Materia) {
 	i.materia = m
 }

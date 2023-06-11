@@ -6,48 +6,43 @@ import (
 )
 
 type Prompt struct {
-	Selection string
-	Selected  bool
+	Selection  bool
 	Quit      bool
 	Msg       string
 }
 
-func NewPrompt(msg string) Prompt {
-	return Prompt{
-		Selection: "Yes",
+func NewPrompt(msg string) *Prompt {
+	return &Prompt{
 		Msg:       msg,
-		Selected:  false,
+		Selection:  false,
 		Quit:      false,
 	}
 }
 
-func (p Prompt) Init() tea.Cmd { return nil }
+func (p *Prompt) Init() tea.Cmd { return nil }
 
-func (p Prompt) Update(msg tea.Msg) Prompt {
+func (p *Prompt) Update(msg tea.Msg) *Prompt {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		if msg.String() == "enter" {
 			p.Quit = true
-			p.Selected = true
 		}
 
 		if msg.String() == "q" {
+            p.Selection = false
 			p.Quit = true
 		}
 
 		options := map[string]struct{}{"j": {}, "k": {}, "h": {}, "l": {}, "left": {}, "right": {}}
 		if _, ok := options[msg.String()]; ok {
-			if p.Selection == "Yes" {
-				p.Selection = "No"
-			} else {
-				p.Selection = "Yes"
-			}
+            p.Selection = !p.Selection
 		}
 	}
 	return p
 }
 
-func (p Prompt) View() string {
+// TODO: refactor
+func (p *Prompt) View() string {
 	style := lipgloss.NewStyle().
 		Align(lipgloss.Center).
 		Border(lipgloss.RoundedBorder(), true)
@@ -60,7 +55,7 @@ func (p Prompt) View() string {
 
 	yes := "Yes"
 	no := "No"
-	if p.Selection == "Yes" {
+	if p.Selection {
 		yes = selection.Render(yes)
 	} else {
 		no = selection.Render(no)

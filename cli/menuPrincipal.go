@@ -11,8 +11,8 @@ func NewMainMenu() MenuPrincipal {
 	items := []list.Item{
 		menuItem{Action: "horario", Tit: "Mi horario", Desc: "Revisa tu horario semanal y las fechas de examenes"},
 		menuItem{Action: "calendario", Tit: "Calendario", Desc: "Mira en un calendario tus fechas de examenes"},
-		menuItem{Action: "modHorario", Tit: "Modificar horario", Desc: "Realiza cambios en el horario (primero debes configurar el excel en 'Configuraciones')"},
-		menuItem{Action: "configuracion", Tit: "Configuracion", Desc: "Cambia las configuraciones del sistema"},
+		menuItem{Action: "scheduleMaker", Tit: "Modificar horario", Desc: "Realiza cambios en el horario (primero debes configurar el excel en 'Configuraciones')"},
+		menuItem{Action: "configMenu", Tit: "Configuracion", Desc: "Cambia las configuraciones del sistema"},
 		menuItem{Action: "salir", Tit: "Salir", Desc: "Mas vale que sea para fiestear, ehemm, estudiar..."},
 	}
 
@@ -31,8 +31,8 @@ func (i menuItem) Description() string { return i.Desc }
 func (i menuItem) FilterValue() string { return i.Action }
 
 type MenuPrincipal struct {
-	List     list.Model
-	Selected bool
+	List       list.Model
+	IsSelected bool
 }
 
 func (m MenuPrincipal) Init() tea.Cmd {
@@ -45,7 +45,7 @@ func (m MenuPrincipal) Update(msg tea.Msg) (MenuPrincipal, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		if msg.String() == "enter" {
-			m.Selected = true
+			m.IsSelected = true
 		}
 		// si la tecla precionada es una de las de salir
 		if msg.String() == "q" || msg.String() == "esc" {

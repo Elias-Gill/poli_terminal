@@ -13,7 +13,7 @@ const (
 	inMenu = iota
 	inHorario
 	inSelection
-	inArmarHor
+	inScheduleMaker
 )
 
 type App struct {
@@ -23,9 +23,9 @@ type App struct {
 	config    *cfman.Configurations
 
 	// components
-	mainMenu     MenuPrincipal
-	horario      horario.DisplayHorario
-	armador armHors.ArmadorHorario
+	mainMenu MenuPrincipal
+	horario  horario.DisplayHorario
+	maker    armHors.ScheduleMaker
 }
 
 func NewApp() App {
@@ -65,9 +65,9 @@ func (a App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			a.Mode = inMenu
 		}
 
-	case inArmarHor:
-		a.armador, cmd = a.armador.Update(msg)
-		if a.armador.Quit {
+	case inScheduleMaker:
+		a.maker, cmd = a.maker.Update(msg)
+		if a.maker.Quit {
 			a.mainMenu.List.SetWidth(a.appWith)
 			a.mainMenu.List.SetHeight(a.appHeight)
 			a.Mode = inMenu
@@ -75,7 +75,7 @@ func (a App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case inMenu:
 		a.mainMenu, cmd = a.mainMenu.Update(msg)
-		if a.mainMenu.Selected {
+		if a.mainMenu.IsSelected {
 			return a.selectMode()
 		}
 	}
@@ -86,8 +86,8 @@ func (a App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 // selecciona la vista dependiendo del estado de la aplicacion
 func (m App) View() string {
 	switch m.Mode {
-	case inArmarHor:
-		return styles.DocStyle.Render(m.armador.View())
+	case inScheduleMaker:
+		return styles.DocStyle.Render(m.maker.View())
 
 	case inHorario:
 		return styles.DocStyle.Render(m.horario.View())
@@ -97,19 +97,19 @@ func (m App) View() string {
 }
 
 /*
-triggered when and option is 3elected in the main menu.
+triggered when an option is selected in the main menu.
 Handles the App state and sets the correct mode
 */
 func (a App) selectMode() (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
-	a.mainMenu.Selected = false
+	a.mainMenu.IsSelected = false
 	// change app mode
 	switch a.mainMenu.List.SelectedItem().FilterValue() {
-	case "modHorario": // abrir la lista de materias entera
-		a.Mode = inArmarHor
-		a.armador = armHors.NewArmador()
+	case "scheduleMaker":
+		a.Mode = inScheduleMaker
+		a.maker = armHors.NewScheduleMaker()
 		// truco para mandar informacion de tamano
-		a.armador, _ = a.armador.Update(
+		a.maker, _ = a.maker.Update(
 			tea.WindowSizeMsg{
 				Width:  a.appWith,
 				Height: a.appHeight,
@@ -126,6 +126,9 @@ func (a App) selectMode() (tea.Model, tea.Cmd) {
 		}
 
 	case "calendario": // abrir el calendario
+		// TODO: IMPLEMENTAR
+
+	case "configMenu": // abrir el calendario
 		// TODO: IMPLEMENTAR
 
 	case "salir":

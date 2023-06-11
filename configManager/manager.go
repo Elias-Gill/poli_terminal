@@ -18,8 +18,9 @@ type Configurations struct {
 	Sheet           int           `json:"sheet_number"`
 }
 
+// TODO: no estaria proporcionar metodos y que la config sea inmutable desde afuera (mandar una copia)
 var configPaths = searchConfigFiles()
-var usersConfig = LoadUserConfig()
+var usersConfig = loadUserConfig()
 
 type paths struct {
 	path string
@@ -36,11 +37,11 @@ func (c *Configurations) ChangeMateriasUsuario(m []*ep.Materia) {
 	c.MateriasUsuario = m
 }
 
-// Cambia el archivo excel y lo parsea de manera asincrona
+// Cambia el archivo excel y lo parsea
 func (c *Configurations) ChangeExcelFile(f string) error {
 	aux, err := ep.Parse(f, c.Sheet)
 	if err != nil {
-		panic("no se puede abrir el execl")
+		panic("no se puede abrir el excel")
 	}
 	c.ExcelFile = f
 	c.MateriasExcel = aux
@@ -49,10 +50,10 @@ func (c *Configurations) ChangeExcelFile(f string) error {
 
 // Parsear la configuracion del usuario y la guarda en memoria. Solo se llama una vez al inicio
 // del programa
-func LoadUserConfig() *Configurations {
+func loadUserConfig() *Configurations {
 	// asegurarse que el archivo exista
 	ensureConfigExistence()
-	file, _ := os.Open(configPaths.file)
+    file, _ := os.Open(configPaths.file) // INFO: no hace falta revisar el error
 	defer file.Close()
 	// parsear
 	var config Configurations

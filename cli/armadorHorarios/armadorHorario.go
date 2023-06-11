@@ -19,62 +19,58 @@ const (
 	inPrompt
 )
 
-type ArmadorHorario struct {
-	width       int
-	height      int
-	Quit        bool
-	mode        int
-	prompt      pts.Prompt
-	infoMat     *infoMateria
-	listaSelecs *listSelecs
-	selector    *selectMats
+type ScheduleMaker struct {
+	width           int
+	height          int
+	Quit            bool
+	mode            int
+	prompt          *pts.Prompt
+	infoMat         *infoMateria
+	selectedList    *listSelecs
+	subjectSelector *selectorMats
 }
 
-func NewArmador() ArmadorHorario {
+func NewScheduleMaker() ScheduleMaker {
 	selector, err := newSelectorMats()
-    if err != nil {
-        panic("No se pudo inicializar el armador de horarios")
-    }
-    inf := newInfoMateria(selector.Focused)
-    lista := newListaSelecciones()
-	return ArmadorHorario{
-		mode:        inSelector,
-		Quit:        false,
-		infoMat:     inf,
-		listaSelecs: lista,
-		selector:    selector,
+	if err != nil {
+		panic("No se pudo inicializar el armador de horarios")
+	}
+	inf := newInfoMateria(selector.Focused)
+	lista := newListaSelecciones()
+	return ScheduleMaker{
+		mode:            inSelector,
+		Quit:            false,
+		infoMat:         inf,
+		selectedList:    lista,
+		subjectSelector: selector,
 	}
 }
 
-func (a ArmadorHorario) Init() tea.Cmd { return nil }
+func (a ScheduleMaker) Init() tea.Cmd { return nil }
 
-func (a ArmadorHorario) Update(msg tea.Msg) (ArmadorHorario, tea.Cmd) {
+func (a ScheduleMaker) Update(msg tea.Msg) (ScheduleMaker, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		// salir
 		if msg.String() == "q" || msg.String() == tea.KeyEsc.String() {
-			// TODO:delegar al selector
-			if !a.selector.Filtering || a.mode == inLista {
+			if a.mode != inSelector || !a.subjectSelector.Filtering {
 				a.mode = inPrompt
 				a.prompt = pts.NewPrompt("Desea GUARDAR este nuevo horario ?")
 				return a, nil
 			}
 		}
 
-		// mensaje de confirmacion
-		// TODO: refactor
+		// prompt de confirmacion
 		if a.mode == inPrompt {
-			if msg.String() == "enter" {
-				if a.prompt.Selection == "Yes" {
+			a.prompt.Update(msg)
+			if a.prompt.Quit {
+				if a.prompt.Selection {
 					c := configManager.GetUserConfig()
-					c.ChangeMateriasUsuario(a.listaSelecs.lista)
+					c.ChangeMateriasUsuario(a.selectedList.lista)
 					c.WriteUserConfig()
 				}
 				a.Quit = true
-				return a, nil
 			}
-			a.prompt = a.prompt.Update(msg)
 			return a, nil
 		}
 
@@ -85,7 +81,7 @@ func (a ArmadorHorario) Update(msg tea.Msg) (ArmadorHorario, tea.Cmd) {
 			} else {
 				a.mode = inLista
 			}
-			a.listaSelecs.isFocused = !a.listaSelecs.isFocused
+			a.selectedList.isFocused = !a.selectedList.isFocused
 			return a, nil
 		}
 
@@ -98,36 +94,33 @@ func (a ArmadorHorario) Update(msg tea.Msg) (ArmadorHorario, tea.Cmd) {
 	}
 
 	if a.mode == inSelector {
-		// anadir materia
-		cmd = a.selector.Update(msg)
-		a.infoMat.ChangeMateria(a.selector.Focused)
-		if !a.selector.Filtering {
-			if a.selector.IsSelected {
-				a.listaSelecs.AddMateria(a.selector.Focused)
-				a.selector.IsSelected = false
-			}
+		cmd = a.subjectSelector.Update(msg)
+		a.infoMat.CambiarMateria(a.subjectSelector.Focused)
+		if a.subjectSelector.IsSelected {
+			a.selectedList.AddMateria(a.subjectSelector.Focused)
+			a.subjectSelector.IsSelected = false
 		}
 		return a, cmd
 	}
 
 	if a.mode == inLista {
-		cmd = a.listaSelecs.Update(msg)
+		cmd = a.selectedList.Update(msg)
 		return a, cmd
 	}
 
 	return a, cmd
 }
 
-func (a ArmadorHorario) View() string {
+func (a ScheduleMaker) View() string {
 	if a.mode == inPrompt {
 		return a.prompt.View()
 	}
-	aux := lipgloss.JoinVertical(0, a.infoMat.View(), a.listaSelecs.View())
-	return lipgloss.JoinHorizontal(0, a.selector.View(), aux)
+	aux := lipgloss.JoinVertical(0, a.infoMat.View(), a.selectedList.View())
+	return lipgloss.JoinHorizontal(0, a.subjectSelector.View(), aux)
 }
 
 // calcula los tamanos necesarios para los objetos en pantalla
-func (a ArmadorHorario) UpdateSize(m tea.WindowSizeMsg) ArmadorHorario {
+func (a ScheduleMaker) UpdateSize(m tea.WindowSizeMsg) ScheduleMaker {
 	var selector, info, lista tea.WindowSizeMsg
 	x, y := styles.DocStyle.GetFrameSize()
 	m.Height -= y
@@ -143,8 +136,8 @@ func (a ArmadorHorario) UpdateSize(m tea.WindowSizeMsg) ArmadorHorario {
 	lista.Height = m.Height / 2
 
 	a.infoMat.Update(info)
-	a.selector.Update(selector)
-	a.listaSelecs.Update(lista)
+	a.subjectSelector.Update(selector)
+	a.selectedList.Update(lista)
 
 	return a
 }
