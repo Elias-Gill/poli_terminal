@@ -6,6 +6,15 @@ import (
 	"github.com/elias-gill/poli_terminal/styles"
 )
 
+type menuItem struct {
+	Tit, Desc, Action string
+}
+
+type MainMenu struct {
+	List       list.Model
+	IsSelected bool
+}
+
 // generates a new instance of the main menu
 func NewMainMenu() MainMenu {
 	items := []list.Item{
@@ -22,18 +31,9 @@ func NewMainMenu() MainMenu {
 	return m
 }
 
-type menuItem struct {
-	Tit, Desc, Action string
-}
-
 func (i menuItem) Title() string       { return i.Tit }
 func (i menuItem) Description() string { return i.Desc }
 func (i menuItem) FilterValue() string { return i.Action }
-
-type MainMenu struct {
-	List       list.Model
-	IsSelected bool
-}
 
 func (m MainMenu) Init() tea.Cmd {
 	return nil

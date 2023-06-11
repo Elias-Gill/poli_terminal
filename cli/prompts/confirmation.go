@@ -41,11 +41,10 @@ func (p *ConfirmPrompt) Update(msg tea.Msg) *ConfirmPrompt {
 	return p
 }
 
-// TODO: refactor
 func (p *ConfirmPrompt) View() string {
 	style := lipgloss.NewStyle().
 		Align(lipgloss.Center).
-		Border(lipgloss.RoundedBorder(), true)
+		Border(lipgloss.RoundedBorder(), false, false, true)
 
 	tittle := lipgloss.NewStyle().
 		Align(lipgloss.Center).

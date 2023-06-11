@@ -10,9 +10,10 @@ import (
 
 // modos
 const (
-	inMenu = iota
-	inHorario
-	inSelection
+	inMainMenu = iota
+	inScheduleDisplayer
+	inConfigMenu
+	inCalendar
 	inScheduleMaker
 )
 
@@ -23,16 +24,17 @@ type App struct {
 	config    *cfman.Configurations
 
 	// components
-	mainMenu menus.MainMenu
-	horario  schedule.ScheduleDisplayer
-	maker    schedule.ScheduleMaker
+	mainMenu   menus.MainMenu
+	configMenu menus.ConfigMenu
+	displayer  schedule.ScheduleDisplayer
+	maker      schedule.ScheduleMaker
 }
 
 func NewApp() App {
 	return App{
 		mainMenu: menus.NewMainMenu(),
 		config:   cfman.GetUserConfig(),
-		Mode:     inMenu,
+		Mode:     inMainMenu,
 	}
 }
 
@@ -57,12 +59,12 @@ func (a App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	// handle events per mode
 	switch a.Mode {
-	case inHorario:
-		a.horario, cmd = a.horario.Update(msg)
-		if a.horario.Quit {
+	case inScheduleDisplayer:
+		a.displayer, cmd = a.displayer.Update(msg)
+		if a.displayer.Quit {
 			a.mainMenu.List.SetWidth(a.appWith)
 			a.mainMenu.List.SetHeight(a.appHeight)
-			a.Mode = inMenu
+			a.Mode = inMainMenu
 		}
 
 	case inScheduleMaker:
@@ -70,13 +72,21 @@ func (a App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if a.maker.Quit {
 			a.mainMenu.List.SetWidth(a.appWith)
 			a.mainMenu.List.SetHeight(a.appHeight)
-			a.Mode = inMenu
+			a.Mode = inMainMenu
 		}
 
-	case inMenu:
+	case inMainMenu:
 		a.mainMenu, cmd = a.mainMenu.Update(msg)
 		if a.mainMenu.IsSelected {
 			return a.selectMode()
+		}
+
+	case inConfigMenu:
+		a.configMenu, cmd = a.configMenu.Update(msg)
+		if a.configMenu.Quit {
+			a.mainMenu.List.SetWidth(a.appWith)
+			a.mainMenu.List.SetHeight(a.appHeight)
+			a.Mode = inMainMenu
 		}
 	}
 
@@ -89,8 +99,11 @@ func (m App) View() string {
 	case inScheduleMaker:
 		return styles.DocStyle.Render(m.maker.View())
 
-	case inHorario:
-		return styles.DocStyle.Render(m.horario.View())
+	case inScheduleDisplayer:
+		return styles.DocStyle.Render(m.displayer.View())
+
+	case inConfigMenu:
+		return styles.DocStyle.Render(m.configMenu.View())
 	}
 	// por default se muestra el menu principal
 	return styles.DocStyle.Render(m.mainMenu.View())
@@ -108,7 +121,6 @@ func (a App) selectMode() (tea.Model, tea.Cmd) {
 	case "scheduleMaker":
 		a.Mode = inScheduleMaker
 		a.maker = schedule.NewScheduleMaker()
-		// truco para mandar informacion de tamano
 		a.maker, _ = a.maker.Update(
 			tea.WindowSizeMsg{
 				Width:  a.appWith,
@@ -116,19 +128,28 @@ func (a App) selectMode() (tea.Model, tea.Cmd) {
 			},
 		)
 
-	case "horario": // abrir mi horario actual TODO: continuar
-		a.Mode = inHorario
-		var err error
-		a.horario = schedule.NewScheduleDisplayer()
-		if err != nil {
-			panic(err)
-		}
+	case "horario": // abrir la vista del horario
+		a.Mode = inScheduleDisplayer
+		a.displayer = schedule.NewScheduleDisplayer()
+		a.displayer, _ = a.displayer.Update(
+			tea.WindowSizeMsg{
+				Width:  a.appWith,
+				Height: a.appHeight,
+			},
+		)
 
 	case "calendario": // abrir el calendario
 		// TODO: IMPLEMENTAR
 
-	case "configMenu": // abrir el calendario
-		// TODO: IMPLEMENTAR
+	case "configMenu": // abrir el menu de configuracion
+		a.Mode = inConfigMenu
+		a.configMenu = menus.NewConfigMenu()
+		a.configMenu, _ = a.configMenu.Update(
+			tea.WindowSizeMsg{
+				Width:  a.appWith,
+				Height: a.appHeight,
+			},
+		)
 
 	case "salir":
 		return a, tea.Quit
