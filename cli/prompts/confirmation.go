@@ -6,7 +6,7 @@ import (
 )
 
 type ConfirmPrompt struct {
-	Selection  bool
+	Selection bool
 	Quit      bool
 	Msg       string
 }
@@ -14,7 +14,7 @@ type ConfirmPrompt struct {
 func NewConfirmPrompt(msg string) *ConfirmPrompt {
 	return &ConfirmPrompt{
 		Msg:       msg,
-		Selection:  false,
+		Selection: false,
 		Quit:      false,
 	}
 }
@@ -29,13 +29,13 @@ func (p *ConfirmPrompt) Update(msg tea.Msg) *ConfirmPrompt {
 		}
 
 		if msg.String() == "q" {
-            p.Selection = false
+			p.Selection = false
 			p.Quit = true
 		}
 
 		options := map[string]struct{}{"j": {}, "k": {}, "h": {}, "l": {}, "left": {}, "right": {}}
 		if _, ok := options[msg.String()]; ok {
-            p.Selection = !p.Selection
+			p.Selection = !p.Selection
 		}
 	}
 	return p
@@ -44,13 +44,13 @@ func (p *ConfirmPrompt) Update(msg tea.Msg) *ConfirmPrompt {
 func (p *ConfirmPrompt) View() string {
 	style := lipgloss.NewStyle().
 		Align(lipgloss.Center).
-		Border(lipgloss.RoundedBorder(), false, false, true)
+		Border(lipgloss.RoundedBorder(), true)
 
 	tittle := lipgloss.NewStyle().
 		Align(lipgloss.Center).
-		Border(lipgloss.RoundedBorder(), true)
+		Border(lipgloss.RoundedBorder(), false, false, true)
 
-	selection := lipgloss.NewStyle().Foreground(lipgloss.Color("#912"))
+	selection := lipgloss.NewStyle().Foreground(lipgloss.Color("#ae67f0"))
 
 	yes := "Yes"
 	no := "No"
@@ -60,5 +60,5 @@ func (p *ConfirmPrompt) View() string {
 		no = selection.Render(no)
 	}
 	return style.Render(
-		tittle.Render(p.Msg+"\n") + "\n" + yes + "\t" + no)
+		tittle.Render(p.Msg+"\n") + "\n" + yes + "    " + no)
 }

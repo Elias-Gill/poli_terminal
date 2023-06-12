@@ -3,7 +3,25 @@ package menus
 import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/elias-gill/poli_terminal/cli/prompts"
 	"github.com/elias-gill/poli_terminal/styles"
+)
+
+type menuConfigItem struct {
+	Tit, Desc, Action string
+}
+
+type ConfigMenu struct {
+	Quit bool
+	mode int
+	List list.Model
+	// components
+	fileTree *prompts.Filetree
+}
+
+const (
+    inMenu = iota
+	inFileTree
 )
 
 func NewConfigMenu() ConfigMenu {
@@ -11,41 +29,38 @@ func NewConfigMenu() ConfigMenu {
 		menuItem{Action: "Excel", Tit: "Excel", Desc: "Cambia el archivo excel que se lee"},
 	}
 
-	m := ConfigMenu{List: list.New(items, list.NewDefaultDelegate(), 0, 0)}
+    m := ConfigMenu{List: list.New(items, list.NewDefaultDelegate(), 0, 0), mode: inMenu}
 	m.List.Title = "Settings"
 	m.List.SetFilteringEnabled(false)
 	return m
-}
-
-type menuConfigItem struct {
-	Tit, Desc, Action string
 }
 
 func (i menuConfigItem) Title() string       { return i.Tit }
 func (i menuConfigItem) Description() string { return i.Desc }
 func (i menuConfigItem) FilterValue() string { return i.Action }
 
-type ConfigMenu struct {
-	Quit     bool
-	List     list.Model
-	Selected bool
-}
-
 func (m ConfigMenu) Init() tea.Cmd {
 	return nil
 }
 
-// actualizar el modelo
 func (m ConfigMenu) Update(msg tea.Msg) (ConfigMenu, tea.Cmd) {
-	// handle special events
+	if m.mode == inFileTree {
+		var cmd tea.Cmd
+		cmd = m.fileTree.Update(msg)
+        if m.fileTree.Quit {
+            m.mode = inMenu
+        }
+		return m, cmd
+	}
+
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		if msg.String() == "enter" {
-			m.Selected = true
-		}
-		// si la tecla precionada es una de las de salir
-		if msg.String() == "q" || msg.String() == "esc" {
-            m.Quit = true
+		switch msg.String() {
+		case "enter":
+			return m.changeMode()
+
+		case "q", "esc":
+			m.Quit = true
 			return m, nil
 		}
 
@@ -61,5 +76,23 @@ func (m ConfigMenu) Update(msg tea.Msg) (ConfigMenu, tea.Cmd) {
 
 // mostrar menu de seleccion
 func (m ConfigMenu) View() string {
+    if m.mode == inFileTree {
+        return m.fileTree.View()
+    }
 	return m.List.View()
+}
+
+func (m ConfigMenu) changeMode() (ConfigMenu, tea.Cmd) {
+	switch m.List.SelectedItem().FilterValue() {
+	case "Excel":
+		m.mode = inFileTree
+		m.fileTree = prompts.NewFiletree()
+		m.fileTree.Update(
+			tea.WindowSizeMsg{
+				Width:  m.List.Width(),
+				Height: m.List.Height(),
+			},
+		)
+	}
+	return m, nil
 }

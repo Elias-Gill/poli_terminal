@@ -44,11 +44,10 @@ func (m MainMenu) Update(msg tea.Msg) (MainMenu, tea.Cmd) {
 	// handle special events
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		if msg.String() == "enter" {
+		switch msg.String() {
+		case "enter":
 			m.IsSelected = true
-		}
-		// si la tecla precionada es una de las de salir
-		if msg.String() == "q" || msg.String() == "esc" {
+		case "esc", "q":
 			return m, tea.Quit
 		}
 
