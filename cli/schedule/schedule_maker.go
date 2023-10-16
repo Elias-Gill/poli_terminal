@@ -3,6 +3,7 @@ package schedule
 import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/elias-gill/poli_terminal/cli/constants"
 	pts "github.com/elias-gill/poli_terminal/cli/prompts"
 	"github.com/elias-gill/poli_terminal/configManager"
 	"github.com/elias-gill/poli_terminal/styles"
@@ -22,7 +23,6 @@ const (
 type ScheduleMaker struct {
 	width           int
 	height          int
-	Quit            bool
 	mode            int
 	prompt          *pts.ConfirmPrompt
 	infoMat         *subjectInfo
@@ -39,7 +39,6 @@ func NewScheduleMaker() ScheduleMaker {
 	lista := newListaSelecciones()
 	return ScheduleMaker{
 		mode:            inSelector,
-		Quit:            false,
 		infoMat:         inf,
 		selectedList:    lista,
 		subjectSelector: selector,
@@ -48,7 +47,7 @@ func NewScheduleMaker() ScheduleMaker {
 
 func (a ScheduleMaker) Init() tea.Cmd { return nil }
 
-func (a ScheduleMaker) Update(msg tea.Msg) (ScheduleMaker, tea.Cmd) {
+func (a ScheduleMaker) Update(msg tea.Msg) (constants.Component, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -69,7 +68,7 @@ func (a ScheduleMaker) Update(msg tea.Msg) (ScheduleMaker, tea.Cmd) {
 					c.ChangeMateriasUsuario(a.selectedList.lista)
 					c.WriteUserConfig()
 				}
-				a.Quit = true
+                constants.CurrentMode = constants.InMainMenu
 			}
 			return a, nil
 		}
@@ -111,7 +110,7 @@ func (a ScheduleMaker) Update(msg tea.Msg) (ScheduleMaker, tea.Cmd) {
 	return a, cmd
 }
 
-func (a ScheduleMaker) View() string {
+func (a ScheduleMaker) Render() string {
 	if a.mode == inPrompt {
 		return a.prompt.View()
 	}

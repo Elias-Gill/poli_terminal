@@ -8,14 +8,13 @@ import (
 )
 
 type subjectInfo struct {
-	Quit    bool
 	materia *ep.Materia
 	width   int
 	height  int
 }
 
 func newInfoMateria(m *ep.Materia) *subjectInfo {
-	return &subjectInfo{materia: m, Quit: false}
+	return &subjectInfo{materia: m}
 }
 
 func (i *subjectInfo) Init() tea.Cmd { return nil }

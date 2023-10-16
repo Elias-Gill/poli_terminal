@@ -18,7 +18,6 @@ type selectedList struct {
 	height    int
 	width     int
 	isFocused bool
-	Quit      bool
 }
 
 func (m *selectedList) Init() tea.Cmd { return nil }
@@ -65,7 +64,6 @@ func newListaSelecciones() *selectedList {
 		table:     construirTabla(m),
 		lista:     m,
 		isFocused: false,
-		Quit:      false,
 	}
 }
 

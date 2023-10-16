@@ -10,18 +10,18 @@ import (
 
 // Filetree represents the properties of the UI.
 type Filetree struct {
-	filetree filetree.Bubble
 	Quit     bool
+	filetree filetree.Bubble
 }
 
 // NewFiletree creates a new instance of the UI.
 func NewFiletree() *Filetree {
-    userHome, _ := os.UserHomeDir()
+	userHome, _ := os.UserHomeDir()
 	filetreeModel := filetree.New(
 		true,
 		true,
-        userHome,
-        userHome,
+		userHome,
+		userHome,
 		lipgloss.AdaptiveColor{Light: "#000000", Dark: "63"},
 		lipgloss.AdaptiveColor{Light: "#000000", Dark: "63"},
 		lipgloss.AdaptiveColor{Light: "63", Dark: "63"},

@@ -6,6 +6,7 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/elias-gill/poli_terminal/cli/constants"
 	cfm "github.com/elias-gill/poli_terminal/configManager"
 	ep "github.com/elias-gill/poli_terminal/excelParser"
 )
@@ -25,7 +26,6 @@ type selector struct {
 	// estados
 	IsSelected bool // Determina si se selecciono una materia ("enter")
 	Filtering  bool
-	Quit       bool
 	// materias
 	materias []*ep.Materia
 	Focused  *ep.Materia
@@ -50,7 +50,6 @@ func newSelectorMats() (*selector, error) {
 	// instanciar
 	m := selector{
 		list:       list.New(items, list.NewDefaultDelegate(), 0, 0),
-		Quit:       false,
 		materias:   materias,
 		Focused:    &ep.Materia{},
 		IsSelected: false,
@@ -77,7 +76,7 @@ func (m *selector) Update(msg tea.Msg) tea.Cmd {
 		}
         if msg.String() == "q" || msg.String() == tea.KeyEsc.String() {
             if !m.Filtering {
-                m.Quit = true
+                constants.CurrentMode = constants.InMainMenu
                 return nil
             }
         }

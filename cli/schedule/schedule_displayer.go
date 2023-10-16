@@ -4,6 +4,7 @@ import (
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/elias-gill/poli_terminal/cli/constants"
 	"github.com/elias-gill/poli_terminal/configManager"
 	ep "github.com/elias-gill/poli_terminal/excelParser"
 )
@@ -11,19 +12,18 @@ import (
 type ScheduleDisplayer struct {
 	tablaMats table.Model
 	tablaDias table.Model
-	Quit      bool
 }
 
 func (m ScheduleDisplayer) Init() tea.Cmd { return nil }
 
-func (m ScheduleDisplayer) Update(msg tea.Msg) (ScheduleDisplayer, tea.Cmd) {
+func (m ScheduleDisplayer) Update(msg tea.Msg) (constants.Component, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		// si la tecla precionada es una de las de salir
 		keyExit := msg.String() == "q" || msg.String() == "esc"
 		if keyExit {
-			m.Quit = true
+            constants.CurrentMode = constants.InMainMenu
 			return m, nil
 		}
 	}
@@ -32,7 +32,7 @@ func (m ScheduleDisplayer) Update(msg tea.Msg) (ScheduleDisplayer, tea.Cmd) {
 	return m, cmd
 }
 
-func (m ScheduleDisplayer) View() string {
+func (m ScheduleDisplayer) Render() string {
 	var baseStyle = lipgloss.NewStyle().
 		BorderStyle(lipgloss.NormalBorder()).
 		BorderForeground(lipgloss.Color("23"))
@@ -46,7 +46,6 @@ func NewScheduleDisplayer() ScheduleDisplayer {
 	return ScheduleDisplayer{
 		tablaMats: nuevaTablaMats(m),
 		tablaDias: nuevaTablaDias(m),
-		Quit:      false,
 	}
 }
 

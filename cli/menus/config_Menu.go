@@ -3,6 +3,7 @@ package menus
 import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/elias-gill/poli_terminal/cli/constants"
 	"github.com/elias-gill/poli_terminal/cli/prompts"
 	"github.com/elias-gill/poli_terminal/styles"
 )
@@ -12,7 +13,6 @@ type menuConfigItem struct {
 }
 
 type ConfigMenu struct {
-	Quit bool
 	mode int
 	List list.Model
 	// components
@@ -43,7 +43,7 @@ func (m ConfigMenu) Init() tea.Cmd {
 	return nil
 }
 
-func (m ConfigMenu) Update(msg tea.Msg) (ConfigMenu, tea.Cmd) {
+func (m ConfigMenu) Update(msg tea.Msg) (constants.Component, tea.Cmd) {
 	if m.mode == inFileTree {
 		var cmd tea.Cmd
 		cmd = m.fileTree.Update(msg)
@@ -60,7 +60,7 @@ func (m ConfigMenu) Update(msg tea.Msg) (ConfigMenu, tea.Cmd) {
 			return m.changeMode()
 
 		case "q", "esc":
-			m.Quit = true
+            constants.CurrentMode = constants.InMainMenu
 			return m, nil
 		}
 
@@ -75,7 +75,7 @@ func (m ConfigMenu) Update(msg tea.Msg) (ConfigMenu, tea.Cmd) {
 }
 
 // mostrar menu de seleccion
-func (m ConfigMenu) View() string {
+func (m ConfigMenu) Render() string {
     if m.mode == inFileTree {
         return m.fileTree.View()
     }

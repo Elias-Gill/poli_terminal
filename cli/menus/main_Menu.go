@@ -3,17 +3,32 @@ package menus
 import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/elias-gill/poli_terminal/cli/constants"
 	"github.com/elias-gill/poli_terminal/styles"
 )
 
+// struct para los items del menu
 type menuItem struct {
 	Tit, Desc, Action string
 }
 
+func (i menuItem) Title() string       { return i.Tit }
+func (i menuItem) Description() string { return i.Desc }
+func (i menuItem) FilterValue() string { return i.Action }
+
+// struct principal
 type MainMenu struct {
 	List       list.Model
 	IsSelected bool
 }
+
+const (
+	horario       = "horario"
+	calendario    = "calendario"
+	scheduleMaker = "scheduleMaker"
+	configMenu    = "configMenu"
+	salir         = "salir"
+)
 
 // generates a new instance of the main menu
 func NewMainMenu() MainMenu {
@@ -31,22 +46,18 @@ func NewMainMenu() MainMenu {
 	return m
 }
 
-func (i menuItem) Title() string       { return i.Tit }
-func (i menuItem) Description() string { return i.Desc }
-func (i menuItem) FilterValue() string { return i.Action }
-
 func (m MainMenu) Init() tea.Cmd {
 	return nil
 }
 
 // actualizar el modelo
-func (m MainMenu) Update(msg tea.Msg) (MainMenu, tea.Cmd) {
+func (m MainMenu) Update(msg tea.Msg) (constants.Component, tea.Cmd) {
 	// handle special events
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "enter":
-			m.IsSelected = true
+			return m, m.changeMode() 
 		case "esc", "q":
 			return m, tea.Quit
 		}
@@ -62,6 +73,27 @@ func (m MainMenu) Update(msg tea.Msg) (MainMenu, tea.Cmd) {
 }
 
 // mostrar menu de seleccion
-func (m MainMenu) View() string {
+func (m MainMenu) Render() string {
 	return m.List.View()
+}
+
+func (m MainMenu) changeMode() tea.Cmd {
+    var cmd tea.Cmd = nil
+	switch m.List.SelectedItem().FilterValue() {
+	case horario:
+		constants.CurrentMode = constants.InScheduleDisplayer
+
+	case calendario:
+		constants.CurrentMode = constants.InCalendar
+
+	case salir:
+		cmd = tea.Quit
+
+	case scheduleMaker:
+		constants.CurrentMode = constants.InScheduleMaker
+
+	case configMenu:
+		constants.CurrentMode = constants.InConfigMenu
+	}
+    return cmd
 }
