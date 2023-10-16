@@ -68,7 +68,7 @@ func (a ScheduleMaker) Update(msg tea.Msg) (constants.Component, tea.Cmd) {
 					c.ChangeMateriasUsuario(a.selectedList.lista)
 					c.WriteUserConfig()
 				}
-                constants.CurrentMode = constants.InMainMenu
+				constants.CurrentMode = constants.InMainMenu
 			}
 			return a, nil
 		}

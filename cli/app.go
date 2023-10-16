@@ -51,7 +51,7 @@ func (a App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 
 	a.components[a.Mode], cmd = a.components[a.Mode].Update(msg)
-    a.Mode = consts.CurrentMode
+	a.Mode = consts.CurrentMode
 	return a, cmd
 }
 

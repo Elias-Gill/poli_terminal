@@ -20,7 +20,7 @@ type ConfigMenu struct {
 }
 
 const (
-    inMenu = iota
+	inMenu = iota
 	inFileTree
 )
 
@@ -29,7 +29,7 @@ func NewConfigMenu() ConfigMenu {
 		menuItem{Action: "Excel", Tit: "Excel", Desc: "Cambia el archivo excel que se lee"},
 	}
 
-    m := ConfigMenu{List: list.New(items, list.NewDefaultDelegate(), 0, 0), mode: inMenu}
+	m := ConfigMenu{List: list.New(items, list.NewDefaultDelegate(), 0, 0), mode: inMenu}
 	m.List.Title = "Settings"
 	m.List.SetFilteringEnabled(false)
 	return m
@@ -47,9 +47,9 @@ func (m ConfigMenu) Update(msg tea.Msg) (constants.Component, tea.Cmd) {
 	if m.mode == inFileTree {
 		var cmd tea.Cmd
 		cmd = m.fileTree.Update(msg)
-        if m.fileTree.Quit {
-            m.mode = inMenu
-        }
+		if m.fileTree.Quit {
+			m.mode = inMenu
+		}
 		return m, cmd
 	}
 
@@ -60,7 +60,7 @@ func (m ConfigMenu) Update(msg tea.Msg) (constants.Component, tea.Cmd) {
 			return m.changeMode()
 
 		case "q", "esc":
-            constants.CurrentMode = constants.InMainMenu
+			constants.CurrentMode = constants.InMainMenu
 			return m, nil
 		}
 
@@ -76,9 +76,9 @@ func (m ConfigMenu) Update(msg tea.Msg) (constants.Component, tea.Cmd) {
 
 // mostrar menu de seleccion
 func (m ConfigMenu) Render() string {
-    if m.mode == inFileTree {
-        return m.fileTree.View()
-    }
+	if m.mode == inFileTree {
+		return m.fileTree.View()
+	}
 	return m.List.View()
 }
 

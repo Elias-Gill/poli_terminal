@@ -19,7 +19,7 @@ func newInfoMateria(m *ep.Materia) *subjectInfo {
 
 func (i *subjectInfo) Init() tea.Cmd { return nil }
 
-func (i *subjectInfo) Update(msg tea.Msg) (tea.Cmd) {
+func (i *subjectInfo) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		i.width = msg.Width

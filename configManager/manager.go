@@ -53,7 +53,7 @@ func (c *Configurations) ChangeExcelFile(f string) error {
 func loadUserConfig() *Configurations {
 	// asegurarse que el archivo exista
 	ensureConfigExistence()
-    file, _ := os.Open(configPaths.file) // INFO: no hace falta revisar el error
+	file, _ := os.Open(configPaths.file) // INFO: no hace falta revisar el error
 	defer file.Close()
 	// parsear
 	var config Configurations

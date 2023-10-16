@@ -23,7 +23,7 @@ func (m ScheduleDisplayer) Update(msg tea.Msg) (constants.Component, tea.Cmd) {
 		// si la tecla precionada es una de las de salir
 		keyExit := msg.String() == "q" || msg.String() == "esc"
 		if keyExit {
-            constants.CurrentMode = constants.InMainMenu
+			constants.CurrentMode = constants.InMainMenu
 			return m, nil
 		}
 	}

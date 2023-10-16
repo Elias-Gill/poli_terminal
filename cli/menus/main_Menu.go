@@ -57,7 +57,7 @@ func (m MainMenu) Update(msg tea.Msg) (constants.Component, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "enter":
-			return m, m.changeMode() 
+			return m, m.changeMode()
 		case "esc", "q":
 			return m, tea.Quit
 		}
@@ -78,7 +78,7 @@ func (m MainMenu) Render() string {
 }
 
 func (m MainMenu) changeMode() tea.Cmd {
-    var cmd tea.Cmd = nil
+	var cmd tea.Cmd = nil
 	switch m.List.SelectedItem().FilterValue() {
 	case horario:
 		constants.CurrentMode = constants.InScheduleDisplayer
@@ -95,5 +95,5 @@ func (m MainMenu) changeMode() tea.Cmd {
 	case configMenu:
 		constants.CurrentMode = constants.InConfigMenu
 	}
-    return cmd
+	return cmd
 }
