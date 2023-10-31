@@ -1,8 +1,6 @@
-package schedule
+package armador_horario
 
 import (
-	"fmt"
-
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -35,16 +33,16 @@ type selector struct {
 // se retorna un error
 func newSelectorMats() (*selector, error) {
 	materias := cfm.GetUserConfig().MateriasExcel
-	if materias == nil {
-		return nil, fmt.Errorf("Error al parsear requerir la config del usuario")
-	}
+
 	// Cargar las materias disponibles
 	items := []list.Item{}
-	for _, mat := range materias {
-		items = append(items, itemLista{
-			Tit:  mat.Nombre,
-			Desc: mat.Seccion + " - " + mat.Profesor,
-		})
+	if materias != nil {
+		for _, mat := range materias {
+			items = append(items, itemLista{
+				Tit:  mat.Nombre,
+				Desc: mat.Seccion + " - " + mat.Profesor,
+			})
+		}
 	}
 
 	// instanciar
@@ -76,7 +74,7 @@ func (m *selector) Update(msg tea.Msg) tea.Cmd {
 		}
 		if msg.String() == "q" || msg.String() == tea.KeyEsc.String() {
 			if !m.Filtering {
-				constants.CurrentMode = constants.InMainMenu
+                constants.CurrentMode = constants.InMainMenu
 				return nil
 			}
 		}

@@ -5,6 +5,7 @@ import (
 	consts "github.com/elias-gill/poli_terminal/cli/constants"
 	"github.com/elias-gill/poli_terminal/cli/menus"
 	"github.com/elias-gill/poli_terminal/cli/schedule"
+	"github.com/elias-gill/poli_terminal/cli/schedule/armador_horario"
 	cfman "github.com/elias-gill/poli_terminal/configManager"
 	"github.com/elias-gill/poli_terminal/styles"
 )
@@ -24,9 +25,9 @@ func NewApp() App {
 		// components
 		components: map[int]consts.Component{
 			consts.InMainMenu:          menus.NewMainMenu(),
-			consts.InScheduleDisplayer: schedule.NewScheduleDisplayer(),
+			consts.InScheduleDisplayer: schedule.NewHorario(),
 			consts.InConfigMenu:        menus.NewConfigMenu(),
-			consts.InScheduleMaker:     schedule.NewScheduleMaker(),
+			consts.InScheduleMaker:     armador_horario.NewArmadorHorario(),
 		},
 	}
 }
@@ -51,7 +52,7 @@ func (a App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 
 	a.components[a.Mode], cmd = a.components[a.Mode].Update(msg)
-	a.Mode = consts.CurrentMode
+    a.Mode = consts.CurrentMode
 	return a, cmd
 }
 

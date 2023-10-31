@@ -3,7 +3,7 @@ package menus
 import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/elias-gill/poli_terminal/cli/constants"
+	consts "github.com/elias-gill/poli_terminal/cli/constants"
 	"github.com/elias-gill/poli_terminal/styles"
 )
 
@@ -24,17 +24,15 @@ type MainMenu struct {
 
 const (
 	horario       = "horario"
-	calendario    = "calendario"
 	scheduleMaker = "scheduleMaker"
 	configMenu    = "configMenu"
 	salir         = "salir"
 )
 
 // generates a new instance of the main menu
-func NewMainMenu() MainMenu {
+func NewMainMenu() consts.Component {
 	items := []list.Item{
 		menuItem{Action: "horario", Tit: "Mi horario", Desc: "Revisa tu horario semanal y las fechas de examenes"},
-		menuItem{Action: "calendario", Tit: "Calendario", Desc: "Mira en un calendario tus fechas de examenes"},
 		menuItem{Action: "scheduleMaker", Tit: "Modificar horario", Desc: "Realiza cambios en el horario (primero debes configurar el excel en 'Configuraciones')"},
 		menuItem{Action: "configMenu", Tit: "Configuracion", Desc: "Cambia las configuraciones del sistema"},
 		menuItem{Action: "salir", Tit: "Salir", Desc: "Mas vale que sea para fiestear, ehemm, estudiar..."},
@@ -51,7 +49,7 @@ func (m MainMenu) Init() tea.Cmd {
 }
 
 // actualizar el modelo
-func (m MainMenu) Update(msg tea.Msg) (constants.Component, tea.Cmd) {
+func (m MainMenu) Update(msg tea.Msg) (consts.Component, tea.Cmd) {
 	// handle special events
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -81,19 +79,16 @@ func (m MainMenu) changeMode() tea.Cmd {
 	var cmd tea.Cmd = nil
 	switch m.List.SelectedItem().FilterValue() {
 	case horario:
-		constants.CurrentMode = constants.InScheduleDisplayer
-
-	case calendario:
-		constants.CurrentMode = constants.InCalendar
+		consts.CurrentMode = consts.InScheduleDisplayer
 
 	case salir:
 		cmd = tea.Quit
 
 	case scheduleMaker:
-		constants.CurrentMode = constants.InScheduleMaker
+		consts.CurrentMode = consts.InScheduleMaker
 
 	case configMenu:
-		constants.CurrentMode = constants.InConfigMenu
+		consts.CurrentMode = consts.InConfigMenu
 	}
 	return cmd
 }

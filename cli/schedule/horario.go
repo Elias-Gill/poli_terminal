@@ -9,21 +9,21 @@ import (
 	ep "github.com/elias-gill/poli_terminal/excelParser"
 )
 
-type ScheduleDisplayer struct {
+type Horario struct {
 	tablaMats table.Model
 	tablaDias table.Model
 }
 
-func (m ScheduleDisplayer) Init() tea.Cmd { return nil }
+func (m Horario) Init() tea.Cmd { return nil }
 
-func (m ScheduleDisplayer) Update(msg tea.Msg) (constants.Component, tea.Cmd) {
+func (m Horario) Update(msg tea.Msg) (constants.Component, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		// si la tecla precionada es una de las de salir
 		keyExit := msg.String() == "q" || msg.String() == "esc"
 		if keyExit {
-			constants.CurrentMode = constants.InMainMenu
+            constants.CurrentMode = constants.InMainMenu
 			return m, nil
 		}
 	}
@@ -32,7 +32,7 @@ func (m ScheduleDisplayer) Update(msg tea.Msg) (constants.Component, tea.Cmd) {
 	return m, cmd
 }
 
-func (m ScheduleDisplayer) Render() string {
+func (m Horario) Render() string {
 	var baseStyle = lipgloss.NewStyle().
 		BorderStyle(lipgloss.NormalBorder()).
 		BorderForeground(lipgloss.Color("23"))
@@ -41,15 +41,23 @@ func (m ScheduleDisplayer) Render() string {
 		baseStyle.Render(m.tablaMats.View())
 }
 
-func NewScheduleDisplayer() ScheduleDisplayer {
+func NewHorario() Horario {
 	m := configManager.GetUserConfig().MateriasUsuario
-	return ScheduleDisplayer{
+	return Horario{
 		tablaMats: nuevaTablaMats(m),
 		tablaDias: nuevaTablaDias(m),
 	}
 }
 
 func nuevaTablaDias(m []*ep.Materia) table.Model {
+	if m == nil {
+		return table.New(
+			table.WithColumns([]table.Column{{Title: "No se ha registrado ninguna materia", Width: 18}}),
+			table.WithFocused(false),
+			table.WithHeight(8),
+		)
+	}
+
 	columns := []table.Column{
 		{Title: "", Width: 18},
 		{Title: "Lunes", Width: 18},
@@ -93,6 +101,14 @@ func nuevaTablaDias(m []*ep.Materia) table.Model {
 }
 
 func nuevaTablaMats(m []*ep.Materia) table.Model {
+	if m == nil {
+		return table.New(
+			table.WithColumns([]table.Column{{Title: "No se ha registrado ninguna materia", Width: 18}}),
+			table.WithFocused(false),
+			table.WithHeight(8),
+		)
+	}
+
 	columns := []table.Column{
 		{Title: "Asignatura", Width: 18},
 		{Title: "Profesor", Width: 18},

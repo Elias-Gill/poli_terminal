@@ -1,4 +1,4 @@
-package schedule
+package armador_horario
 
 import (
 	tea "github.com/charmbracelet/bubbletea"
@@ -20,7 +20,7 @@ const (
 	inPrompt
 )
 
-type ScheduleMaker struct {
+type ArmadorHorario struct {
 	width           int
 	height          int
 	mode            int
@@ -30,14 +30,14 @@ type ScheduleMaker struct {
 	subjectSelector *selector
 }
 
-func NewScheduleMaker() ScheduleMaker {
+func NewArmadorHorario() constants.Component {
 	selector, err := newSelectorMats()
 	if err != nil {
 		panic("No se pudo inicializar el armador de horarios")
 	}
 	inf := newInfoMateria(selector.Focused)
 	lista := newListaSelecciones()
-	return ScheduleMaker{
+	return ArmadorHorario{
 		mode:            inSelector,
 		infoMat:         inf,
 		selectedList:    lista,
@@ -45,9 +45,9 @@ func NewScheduleMaker() ScheduleMaker {
 	}
 }
 
-func (a ScheduleMaker) Init() tea.Cmd { return nil }
+func (a ArmadorHorario) Init() tea.Cmd { return nil }
 
-func (a ScheduleMaker) Update(msg tea.Msg) (constants.Component, tea.Cmd) {
+func (a ArmadorHorario) Update(msg tea.Msg) (constants.Component, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -68,7 +68,7 @@ func (a ScheduleMaker) Update(msg tea.Msg) (constants.Component, tea.Cmd) {
 					c.ChangeMateriasUsuario(a.selectedList.lista)
 					c.WriteUserConfig()
 				}
-				constants.CurrentMode = constants.InMainMenu
+                constants.CurrentMode = constants.InMainMenu
 			}
 			return a, nil
 		}
@@ -110,7 +110,7 @@ func (a ScheduleMaker) Update(msg tea.Msg) (constants.Component, tea.Cmd) {
 	return a, cmd
 }
 
-func (a ScheduleMaker) Render() string {
+func (a ArmadorHorario) Render() string {
 	if a.mode == inPrompt {
 		return a.prompt.View()
 	}
@@ -119,7 +119,7 @@ func (a ScheduleMaker) Render() string {
 }
 
 // calcula los tamanos necesarios para los objetos en pantalla
-func (a ScheduleMaker) UpdateSize(m tea.WindowSizeMsg) ScheduleMaker {
+func (a ArmadorHorario) UpdateSize(m tea.WindowSizeMsg) ArmadorHorario {
 	var selector, info, lista tea.WindowSizeMsg
 	x, y := styles.DocStyle.GetFrameSize()
 	m.Height -= y

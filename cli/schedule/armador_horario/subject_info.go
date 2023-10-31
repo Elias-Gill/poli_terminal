@@ -1,4 +1,4 @@
-package schedule
+package armador_horario
 
 import (
 	tea "github.com/charmbracelet/bubbletea"
